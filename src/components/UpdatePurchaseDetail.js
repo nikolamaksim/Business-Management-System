@@ -1,8 +1,10 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { doc, updateDoc } from "firebase/firestore";
 
 export default function UpdatePurchaseDetail({
+  collectionRef,
   updatePurchaseData,
   updateModalSetting,
   handlePageUpdate
@@ -27,25 +29,23 @@ export default function UpdatePurchaseDetail({
   };
 
   // POST Data
-  const update = () => {
-    fetch("http://localhost:4000/api/product/update", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(purchase),
-    })
-      .then((result) => {
-        console.log(result);
-        handlePageUpdate();
-        if (result.status === 200) {
-          alert("purchase information successfully updated!");
-          updateModalSetting();
-        } else {
-          alert("Please input information correctly.")
-        }
-      })
-      .catch((err) => console.log(err));
+  const update = async () => {
+    try {
+      const docRef = doc(collectionRef, updatePurchaseData._id);
+      await updateDoc(docRef, {
+        vin: purchase.vin,
+        manufacturer: purchase.manufacturer,
+        model: purchase.model,
+        year: purchase.year,
+        purchaseDate: purchase.purchaseDate,
+        condition: purchase.condition,
+        initial: purchase.initial,
+      });
+      updateModalSetting();
+      handlePageUpdate();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

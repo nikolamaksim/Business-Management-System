@@ -43,7 +43,7 @@ function PurchaseDetails() {
   // Delete Item
   const deleteItem = async (id) => {
     try {
-      window.confirm("Are you sure to delete this history?");
+      window.confirm("Are you sure to delete this item?");
       const documentRef = doc(db, 'products', id);
       await deleteDoc(documentRef);
       handlePageUpdate();
@@ -254,7 +254,7 @@ function PurchaseDetails() {
                         </PopoverContent>
                       </Popover>
                       <td className="whitespace-nowrap px-2 text-gray-700">
-                        <span>{element.initial + element.additional.reduce((sum, a) => sum + parseInt(a.amount), 0)}</span>
+                        <span>{parseInt(element.initial) + element.additional.reduce((sum, a) => sum + parseInt(a.amount), 0)}</span>
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
                         {element.additional.length ? element.additional[element.additional.length - 1].state : ''}

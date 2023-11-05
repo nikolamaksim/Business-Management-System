@@ -1,6 +1,6 @@
 import { addDoc, serverTimestamp } from "firebase/firestore";
 
-import { Fragment, useRef, useState } from "react";
+import { Fragment, PureComponent, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
@@ -13,7 +13,6 @@ export default function AddPurchaseDetails({
 }) {
 
   const [purchase, setPurchase] = useState({
-    userID: authContext.user,
     vin: "",
     manufacturer: "",
     model: "",
@@ -34,14 +33,25 @@ export default function AddPurchaseDetails({
 
   // Add Purchase Data
   const addSale = async () => {
-    try {
-      await addDoc(collectionRef, {...purchase, timestamp: serverTimestamp(), state: 'not on sale'});
-      addSaleModalSetting();
-      handlePageUpdate();
-      handleAlert();
-    } catch (err) {
-      console.log(err);
-    }
+    if (!purchase.vin || 
+        !purchase.manufacturer || 
+        !purchase.model || 
+        !purchase.year || 
+        !purchase.purchaseDate || 
+        !purchase.condition || 
+        !purchase.condition || 
+        !purchase.initial) {
+          alert('Please fill out the form correctly.')
+        } else {
+          try {
+            await addDoc(collectionRef, {...purchase, timestamp: serverTimestamp(), state: 'not on sale'});
+            addSaleModalSetting();
+            handlePageUpdate();
+            handleAlert();
+          } catch (err) {
+            console.log(err);
+          }
+        }
   }
 
   return (

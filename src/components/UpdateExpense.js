@@ -39,6 +39,7 @@ export default function UpdateExpense({
         await updateDoc(docRef, {
           additional: additional,
         });
+        updateExpenseModalSetting();
         handlePageUpdate();
       } catch (err) {
         console.log(err);
