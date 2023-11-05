@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import SearchByVIN from "../components/SearchByVIN";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../config/firebase.config";
 
 function Inventory() {
+  const collectionRef = collection(db, 'products');
   const [products, setAllProducts] = useState([]);
 
   useEffect(() => {
@@ -9,15 +12,16 @@ function Inventory() {
   }, []);
 
   // Fetching Data of All Products
-  const fetchProductsData = () => {
-    fetch(`http://localhost:4000/api/product/get/`, {
-      method: 'POST'
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setAllProducts(data);
-      })
-      .catch((err) => console.log(err));
+  const fetchProductsData = async () => {
+    try {
+      const q = query(collectionRef, where('state', 'in', ['not on sale', 'on sale']));
+      const findAllProductData = await getDocs(q);
+      let productData = findAllProductData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
+      console.log(productData);
+      setAllProducts(productData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

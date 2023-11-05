@@ -1,4 +1,4 @@
-import {collection, addDoc, getDocs, serverTimestamp, doc, deleteDoc, updateDoc, getDoc} from 'firebase/firestore'
+import {collection, addDoc, getDocs, doc, where, deleteDoc, updateDoc, getDoc, query} from 'firebase/firestore'
 
 import { db } from '../config/firebase.config'
 
@@ -9,13 +9,15 @@ import {Popover,
         PopoverContent,
         } from '@material-tailwind/react';
 import SearchByVIN from "../components/SearchByVIN";
+import UpdateSale from '../components/UpdateSale';
 
 function Sales() {
 
-  const [showSaleModal, setShowSaleModal] = useState(false);
-  const [sales, setAllSalesData] = useState([
+  const collectionRef = collection(db, 'sales');
 
-  ]);
+  const [showSaleModal, setShowSaleModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [sales, setAllSalesData] = useState([]);
   const [updatePage, setUpdatePage] = useState(true);
   const [vinArray, setVINArray] = useState([]);
   const [updateInfo, setUpdateInfo] = useState([]);
@@ -26,49 +28,53 @@ function Sales() {
   }, [updatePage]);
 
   // Fetching Data of All Sales
-  const fetchSalesData = () => {
-    fetch('http://localhost:4000/api/sales/get',
-    {
-      method: 'POST'
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setAllSalesData(data);
-      })
-      .catch((err) => console.log(err));
+  const fetchSalesData = async () => {
+    try {
+      const docSnap = await getDocs(collectionRef);
+      let salesData = docSnap.docs.map((document) => ({...document.data(), _id: document.id}))
+      setAllSalesData(salesData);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // Fetch VIN Numbers of cars on sale
-  const fetchVINNumber = () => {
-    fetch('http://localhost:4000/api/product/getVIN', {
-      method: 'POST',
-    })
-    .then((res) => res.json())
-    .then((res) => {
-      setVINArray(res);
-    })
-    .catch((err) => console.log(err));
+  const fetchVINNumber = async () => {
+    try {
+      const q = query(collection(db, 'products'), where('state', '==', 'on sale'));
+      const docSnap = await getDocs(q);
+      const vinarr = docSnap.docs.map((doc) => doc.data().vin);
+      setVINArray(vinarr);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // approve the Sale
-  const approveSale = (id) => {
-    fetch(`http://localhost:4000/api/sales/approve/${id}`, {
-      method: 'POST'
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        setUpdatePage(!updatePage);
-      } else {
-        alert('Sorry. Please retry.')
+  const approveSale = async (id) => {
+    try {
+      const docRef = doc(collectionRef, id);
+      let docSnap = (await getDoc(docRef)).data();
+      for (let i in docSnap.state) {
+        docSnap.state[i] = 'approved'
       }
-    })
+      updateDoc(docRef, docSnap);
+      handlePageUpdate();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // Modal for Sale Add
-  const addSaleModalSetting = (element) => {
-    setUpdateInfo(element);
+  const addSaleModalSetting = () => {
     setShowSaleModal(!showSaleModal);
   };
+
+  // Modal for Sale update
+  const updateSaleModalSetting = (element) => {
+    setUpdateInfo(element);
+    setShowUpdateModal(!showUpdateModal);
+  }
 
   // Handle Page Update
   const handlePageUpdate = () => {
@@ -78,14 +84,26 @@ function Sales() {
   return (
     <div className="col-span-12 lg:col-span-10  flex justify-center">
       <div className=" flex flex-col gap-5 w-11/12">
+
         {showSaleModal && (
           <AddSale
+            collectionRef={collectionRef}
             addSaleModalSetting={addSaleModalSetting}
+            handlePageUpdate={handlePageUpdate}
+            vinArray={vinArray}
+          />
+        )}
+
+        {showUpdateModal && (
+          <UpdateSale
+            collectionRef={collectionRef}
+            updateSaleModalSetting={updateSaleModalSetting}
             handlePageUpdate={handlePageUpdate}
             vinArray={vinArray}
             updateInfo={updateInfo}
           />
         )}
+
         {/* Table  */}
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
           <div className="flex justify-between pt-5 pb-3 px-3">
@@ -178,7 +196,7 @@ function Sales() {
                       <td className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                         <span
                             className="text-green-700 cursor-pointer"
-                            onClick={() => addSaleModalSetting(element)}
+                            onClick={() => updateSaleModalSetting(element)}
                           >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -273,7 +291,7 @@ function Sales() {
                       <td className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                         <span
                             className="text-green-700 cursor-pointer"
-                            onClick={() => addSaleModalSetting(element)}
+                            onClick={() => updateSaleModalSetting(element)}
                           >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />

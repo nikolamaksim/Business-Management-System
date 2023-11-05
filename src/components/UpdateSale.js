@@ -1,22 +1,20 @@
 import { db } from "../config/firebase.config";
-import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, query, } from 'firebase/firestore';
+import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, getDoc, query, } from 'firebase/firestore';
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-export default function AddSale({
+export default function UpdateSale({
   collectionRef,
-  addSaleModalSetting,
+  updateSaleModalSetting,
   handlePageUpdate,
   vinArray,
+  updateInfo,
 }) {
 
   const [sale, setSale] = useState({
-    vinNumber: '',
     salesDate: '',
-    paymentType: '',
-    price: '',
     income: '',
   });
   const [open, setOpen] = useState(true);
@@ -30,39 +28,25 @@ export default function AddSale({
 
   // POST Data
   const addSale = async () => {
-    if (
-      !sale.vinNumber ||
-      !sale.salesDate ||
-      !sale.paymentType ||
-      !sale.price ||
-      !sale.income
-    ) {
-      alert('Please fill out the form correctly.')
-    } else {
-      try {
-          await addDoc(collectionRef, {
-            vin: sale.vinNumber,
-            salesDate: [sale.salesDate],
-            paymentType: sale.paymentType,
-            price: sale.price,
-            income: [sale.income],
-            state: ['not approved'],
-            timestamp: serverTimestamp(),
-          });
-          const q2 = query(collection(db, 'products'), where('vin', '==', sale.vinNumber));
-          const docSnap = await getDocs(q2);
-          let product_id = docSnap.docs[0].id;
-          updateDoc(doc(db, 'products', product_id), {
-            state: 'sold',
-          });
-          addSaleModalSetting();
-          handlePageUpdate();
-        } catch (err) {
-          alert(err);
-          console.log(err);
-        } 
-      }
-    }
+    if (!sale.salesDate ||
+        !sale.income ) {
+          alert ('Please fill out the form correctly')
+        } else {
+          try {
+            const docRef = doc(collectionRef, updateInfo._id);
+            const docSnap = await getDoc(docRef);
+            let salesData = docSnap.data();
+            salesData.salesDate.push(sale.salesDate);
+            salesData.income.push(sale.income);
+            salesData.state.push('not approved');
+            await updateDoc(docRef, salesData);
+            updateSaleModalSetting();
+            handlePageUpdate();
+          } catch (err) {
+            console.log(err);
+          }
+        }
+  };
 
   return (
     // Modal
@@ -125,12 +109,10 @@ export default function AddSale({
                               name="vinNumber"
                               id="vinNumber"
                               value={sale.vin}
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
+                              disabled
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             >
-                              <option disabled selected>Select VIN Number</option>
+                              <option>{updateInfo.vin}</option>
                               {vinArray.map((element, id) => {
                                 return (
                                   <option key = {`${element}${id}`} value={element}>
@@ -156,6 +138,7 @@ export default function AddSale({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              placeholder={updateInfo.salesDate}
                             />
                           </div>
 
@@ -170,11 +153,9 @@ export default function AddSale({
                               id="paymentType"
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               name="paymentType"
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
+                              disabled
                             >
-                              <option disabled selected>Select Payment Type</option>
+                              <option>{updateInfo.paymentType}</option>
                               <option>Partial Payment</option>
                               <option>Full Payment</option>
                             </select>
@@ -195,6 +176,7 @@ export default function AddSale({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              placeholder={updateInfo.price}
                             />
                           </div>
                           <div className="h-fit w-fit">
@@ -210,6 +192,7 @@ export default function AddSale({
                               id="income"
                               name="income"
                               value={sale.income}
+                              placeholder={updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0)}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
@@ -228,12 +211,12 @@ export default function AddSale({
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={addSale}
                   >
-                    Add Sale
+                    Update Sale
                   </button>
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={() => addSaleModalSetting()}
+                    onClick={() => updateSaleModalSetting()}
                     ref={cancelButtonRef}
                   >
                     Cancel

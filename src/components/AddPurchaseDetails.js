@@ -8,8 +8,7 @@ export default function AddPurchaseDetails({
   collectionRef,
   addSaleModalSetting,
   handlePageUpdate,
-  handleAlert,
-  authContext
+  handleAlert
 }) {
 
   const [purchase, setPurchase] = useState({
