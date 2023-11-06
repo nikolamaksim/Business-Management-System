@@ -1,4 +1,4 @@
-import { collection, getDoc, getDocs, } from 'firebase/firestore';
+import { collection, getDocs, } from 'firebase/firestore';
 import { db } from '../config/firebase.config';
 
 import { Fragment, useContext, useEffect, useState } from "react";
@@ -40,7 +40,6 @@ export default function Header() {
         for (let j in salesDoc.docs[i].data().state) {
           if (salesDoc.docs[i].data().state[j] === 'not approved') {
             count += 1;
-            break;
           }
         }
       }
@@ -50,7 +49,6 @@ export default function Header() {
         for (let j in productDoc.docs[i].data().additional) {
           if (productDoc.docs[i].data().additional[j].state === 'not approved') {
             count += 1;
-            break;
           }
         }
       }

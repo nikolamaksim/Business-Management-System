@@ -1,4 +1,4 @@
-import { addDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, getDocs, serverTimestamp, query, where } from "firebase/firestore";
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -8,7 +8,6 @@ export default function AddPurchaseDetails({
   collectionRef,
   addSaleModalSetting,
   handlePageUpdate,
-  handleAlert
 }) {
 
   const [purchase, setPurchase] = useState({
@@ -43,10 +42,18 @@ export default function AddPurchaseDetails({
           alert('Please fill out the form correctly.')
         } else {
           try {
-            await addDoc(collectionRef, {...purchase, timestamp: serverTimestamp(), state: 'not on sale'});
-            addSaleModalSetting();
-            handlePageUpdate();
-            handleAlert();
+            const docCheck = await getDocs(query(collectionRef, where('vin', '==', purchase.vin)));
+            if (docCheck.empty) {
+              try {
+                await addDoc(collectionRef, {...purchase, timestamp: serverTimestamp(), state: 'not on sale'});
+                addSaleModalSetting();
+                handlePageUpdate();
+              } catch (err) {
+                console.log(err);
+              }
+            } else {
+              alert ('The car information already exists. Please check the VIN number again.')
+            }
           } catch (err) {
             console.log(err);
           }

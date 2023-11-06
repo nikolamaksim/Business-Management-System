@@ -8,7 +8,7 @@ import UpdatePurchaseDetail from "../components/UpdatePurchaseDetail";
 import SearchByVIN from "../components/SearchByVIN";
 import UpdateExpense from "../components/UpdateExpense";
 
-import { Popover, PopoverContent, PopoverHandler, Alert } from "@material-tailwind/react";
+import { Popover, PopoverContent, PopoverHandler, } from "@material-tailwind/react";
 
 function PurchaseDetails() {
 
@@ -20,8 +20,6 @@ function PurchaseDetails() {
   const [updateProduct, setUpdateProduct] = useState([]);
   const [showUpdateExpenseModal, setUpdateExpenseModal] = useState(false);
   const [updatePage, setUpdatePage] = useState(true);
-
-  const [showAlert, setShowAlert] = useState(false);
   
   const authContext = useContext(AuthContext);
 
@@ -106,11 +104,6 @@ function PurchaseDetails() {
     setUpdatePage(!updatePage);
   };
 
-  // Handle Alert
-  const handleAlert = () => {
-    setShowAlert(!showAlert);
-  }
-
   return (
     <div className="col-span-12 lg:col-span-10  flex justify-center">
       <div className=" flex flex-col gap-5 w-11/12">
@@ -120,7 +113,6 @@ function PurchaseDetails() {
             collectionRef={collectionRef}
             addSaleModalSetting={addSaleModalSetting}
             handlePageUpdate={handlePageUpdate}
-            handleAlert={handleAlert}
             authContext = {authContext}
           />
         )}
