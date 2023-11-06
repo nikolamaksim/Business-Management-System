@@ -1,6 +1,6 @@
 import { addDoc, serverTimestamp } from "firebase/firestore";
 
-import { Fragment, PureComponent, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 

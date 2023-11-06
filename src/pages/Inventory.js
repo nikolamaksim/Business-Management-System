@@ -17,7 +17,6 @@ function Inventory() {
       const q = query(collectionRef, where('state', 'in', ['not on sale', 'on sale']));
       const findAllProductData = await getDocs(q);
       let productData = findAllProductData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
-      console.log(productData);
       setAllProducts(productData);
     } catch (err) {
       console.log(err);

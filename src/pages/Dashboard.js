@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../config/firebase.config";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
+
   const [saleAmount, setSaleAmount] = useState([]);
   const [purchaseAmount, setPurchaseAmount] = useState([]);
   const [products, setProducts] = useState([]);
@@ -99,66 +102,87 @@ function Dashboard() {
     return colors;
   }
 
-  // Fetching total sales amount
-  const fetchTotalSaleAmount = () => {
-    fetch(
-      'http://localhost:4000/api/sales/totalsalesamount',
-      {method: 'POST'},
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        setSaleAmount(res.total);
-        setSalesState({
-          good: res.good,
-          normal: res.normal,
-          bad: res.bad
+  // Fetch total sales amount
+  const fetchTotalSaleAmount = async () => {
+    let totalSaleAmount = 0;
+    let normal = 0;
+    let good = 0;
+    let bad = 0;
+    try {
+      const docSnap = await getDocs(collection(db, 'sales'));
+      const salesData = await docSnap.docs.map((doc) => (doc.data()));
+      salesData.forEach((sale)=>{
+        totalSaleAmount += sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0);
+        sale.price <= sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0) 
+        ?
+        good += 1
+        :
+        0.7 * sale.price <= sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)
+        ?
+        normal += 1
+        :
+        bad += 1
+      })
+      setSaleAmount(totalSaleAmount);
+      setSalesState({
+        good: good,
+        normal: normal,
+        bad: bad
+      });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
+  // Fetch total purchase amount
+  const fetchTotalPurchaseAmount = async () => {
+    let totalPurchaseAmount = 0;
+    const docSnap = await getDocs(collection(db, 'products'));
+    docSnap.forEach((purchase) => {
+      totalPurchaseAmount += (parseInt(purchase.data().initial) + purchase.data().additional.reduce((sum, a) => sum + parseInt(a.amount), 0));
+    });
+    setPurchaseAmount(totalPurchaseAmount);
+  }
+
+  // Fetch Data of All Products
+  const fetchProductsData = async () => {
+    const docSnap = await getDocs(collection(db, 'products'));
+    const productData = docSnap.docs.map((doc) => {
+      return doc.data();
+    }).filter((data) => data.state !== 'sold');
+    setProducts(productData);
+    // adjust the data for chart drawing
+    const manufacturerdata = productData.reduce((counts, car) => {
+      counts[car.manufacturer] = (counts[car.manufacturer] || 0) + 1;
+      return counts
+    }, {});
+    setDoughnutBackground(generateRandomColorsArray(Object.keys(manufacturerdata).length));
+    setManufacturerdata(manufacturerdata);
+  }
+
+  // Fetch Monthly Sales
+  const fetchMonthlySalesData = async () => {
+    // Initialize the sales amount
+    let salesAmount = {
+      '2023': Array(12).fill(0), 
+      '2024': Array(12).fill(0), 
+      '2025': Array(12).fill(0),
+    }
+    try {
+      const docSnap = await getDocs(collection(db, 'sales'));
+      docSnap.forEach((sale) => {
+        sale.data().salesDate.forEach((date, i) => {
+          const year = date.split('-')[0];
+          const monthIndex = parseInt(date.split('-')[1]) - 1;
+          salesAmount[year][monthIndex] += parseInt(sale.data().income[i]);
         });
       });
-  };
-
-  // Fetching total purchase amount
-  const fetchTotalPurchaseAmount = () => {
-    fetch(
-      'http://localhost:4000/api/purchase/totalpurchaseamount',
-      {method: 'POST'},
-    )
-      .then((res) => res.json())
-      .then((res) => setPurchaseAmount(res.totalPurchaseAmount));
-  };
-
-  // Fetching Data of All Products
-  const fetchProductsData = () => {
-    fetch('http://localhost:4000/api/product/get',
-    {
-      method: 'POST'
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        // adjust response for chart drawing
-        const manufacturerdata = res.reduce((counts, car) => {
-          counts[car.manufacturer] = (counts[car.manufacturer] || 0) + 1; 
-          return counts
-        }, {});
-        setDoughnutBackground(generateRandomColorsArray(Object.keys(manufacturerdata).length));
-        setManufacturerdata(manufacturerdata);
-        setProducts(res);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Fetching Monthly Sales
-  const fetchMonthlySalesData = () => {
-    fetch('http://localhost:4000/api/sales/getmonthly',
-    {
-      method: 'POST'
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setMonthlySalesData(res);
-        updateChartData(res['2023']);
-      })
-      .catch((err) => console.log(err));
-  };
+      setMonthlySalesData(salesAmount);
+      updateChartData(salesAmount['2023']);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <div className="col-span-12 lg:col-span-10 justify-center">
@@ -240,10 +264,8 @@ function Dashboard() {
           />
           </div>
         </div>
-        <div className="flex content-center flex-col gap-4 rounded-lg border border-gray-100 bg-white p-6">
-          <div className="w-3/4">
+        <div className="flex place-content-center flex-col gap-4 rounded-lg border border-gray-100 bg-white p-20">
           <Doughnut data={data} />
-          </div>
         </div>
       </div>
 

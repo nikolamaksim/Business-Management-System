@@ -11,7 +11,7 @@ export default function UpdateExpense({
 }) {
   const [purchase, setPurchase] = useState({
     date: '',
-    amount: 0,
+    amount: '',
     reason: '',
   });
 
@@ -25,7 +25,7 @@ export default function UpdateExpense({
 
   // POST Data
   const add = async () => {
-    if (purchase.date !== '' && purchase.amount !== 0 && purchase.reason !== '') {
+    if (purchase.date !== '' && purchase.amount !== '' && purchase.reason !== '') {
       try {
         const docRef = doc(collectionRef, updatePurchaseData._id);
         let docSnap = await getDoc(docRef);
@@ -46,7 +46,7 @@ export default function UpdateExpense({
       }
     } else {
       alert('Please fill out the form correctly.');
-  }      
+    }      
   };
 
   return (

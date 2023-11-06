@@ -184,9 +184,9 @@ export default function Header() {
                         href={item.href}
                         className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                       >
-                        <span onClick={() => authContext.signout()}>
+                        {/* <span onClick={() => authContext.signout()}> */}
                           {item.name}{" "}
-                        </span>
+                        {/* </span> */}
                       </Disclosure.Button>
                     ))}
                   </div>

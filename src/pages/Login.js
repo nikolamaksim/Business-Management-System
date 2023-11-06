@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../AuthContext";
 import logo from '../assets/car.png'
 import signin from '../assets/signin.png'
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../config/firebase.config";
 
 function Login() {
   const [form, setForm] = useState({
@@ -24,44 +26,72 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const authCheck = () => {
-    setTimeout(() => {
-      fetch("http://localhost:4000/api/login")
-        .then((response) => response.json())
-        .then((data) => {
-          localStorage.setItem("user", JSON.stringify(data));
-          authContext.signin(data._id, () => {
-            navigate("/");
-          });
-        })
-        .catch((err) => {
-          alert("Wrong credentials, Try again")
-          console.log(err);
-        });
-    }, 3000);
-  };
+  const loginUser = async () => {
+    if (!form.email ||
+        !form.password) {
+          alert('Please fill out the form correctly.');
+        } else {
+          try {
+            const q = query(collection(db, 'users'), where('email', '==', form.email));
+            const docSnap = await getDocs(q);
+            if (!docSnap.docs[0]) {
+              alert("The user doesn't exist.")
+            } else {
+              if (docSnap.docs[0].data().password !== form.password) {
+                alert("Password doesn't match.")
+              } else {
+                console.log(docSnap.docs[0].id);
+                  localStorage.setItem('user', JSON.stringify({...docSnap.docs[0].data(), _id: docSnap.docs[0].id}));
+                  console.log(localStorage.getItem('user'));
+                  authContext.signin(docSnap.docs[0].id, () => {
+                  navigate("/");
+                })
+              }
+            }
+          } catch (err) {
+            console.log(err)
+          }
+        }
+  }
 
-  const loginUser = (e) => {
+  // const authCheck = () => {
+  //   setTimeout(() => {
+  //     fetch("http://localhost:4000/api/login")
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         localStorage.setItem("user", JSON.stringify(data));
+  //         authContext.signin(data._id, () => {
+  //           navigate("/");
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         alert("Wrong credentials, Try again")
+  //         console.log(err);
+  //       });
+  //   }, 3000);
+  // };
+
+  // const loginUser = (e) => {
     // Cannot send empty data
-    if (form.email === "" || form.password === "") {
-      alert("To login user, enter details to proceed...");
-    } else {
-      fetch("http://localhost:4000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(form),
-      })
-        .then((result) => {
-          console.log("User login");
-        })
-        .catch((error) => {
-          console.log("Something went wrong ", error);
-        });
-    }
-    authCheck();
-  };
+  //   if (form.email === "" || form.password === "") {
+  //     alert("To login user, enter details to proceed...");
+  //   } else {
+  //     fetch("http://localhost:4000/api/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-type": "application/json",
+  //       },
+  //       body: JSON.stringify(form),
+  //     })
+  //       .then((result) => {
+  //         console.log("User login");
+  //       })
+  //       .catch((error) => {
+  //         console.log("Something went wrong ", error);
+  //       });
+  //   }
+  //   authCheck();
+  // };
 
 
   const handleSubmit = (e) => {
@@ -128,10 +158,6 @@ function Login() {
                 onClick={loginUser}
               >
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  {/* <LockClosedIcon
-                    className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-                    aria-hidden="true"
-                  /> */}
                 </span>
                 Sign in
               </button>
