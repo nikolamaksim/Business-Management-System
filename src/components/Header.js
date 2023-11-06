@@ -1,3 +1,6 @@
+import { collection, getDoc, getDocs, } from 'firebase/firestore';
+import { db } from '../config/firebase.config';
+
 import { Fragment, useContext, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -28,18 +31,33 @@ export default function Header() {
     fetchNotifications();
   }, [])
 
-  const fetchNotifications = () => {
-    fetch('http://localhost:4000/api/sales/getnotification', 
-    {
-      method: "POST"
-    })
-    .then((res) => res.json())
-    .then((res) => {
-      setNotification(res);
-    })
-    .catch ((err) => {
+  const fetchNotifications = async () => {
+    try {
+      let count = 0;
+      // read unapproved sales data
+      const salesDoc = await getDocs(collection(db, 'sales'));
+      for (let i in salesDoc.docs) {
+        for (let j in salesDoc.docs[i].data().state) {
+          if (salesDoc.docs[i].data().state[j] === 'not approved') {
+            count += 1;
+            break;
+          }
+        }
+      }
+      // read unapproved purchase data
+      const productDoc = await getDocs(collection(db, 'products'));
+      for (let i in productDoc.docs) {
+        for (let j in productDoc.docs[i].data().additional) {
+          if (productDoc.docs[i].data().additional[j].state === 'not approved') {
+            count += 1;
+            break;
+          }
+        }
+      }
+      setNotification(count);
+    } catch (err) {
       console.log(err);
-    })
+    }
   }
 
   return (
