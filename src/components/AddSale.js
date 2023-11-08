@@ -18,7 +18,10 @@ export default function AddSale({
     paymentType: '',
     price: '',
     income: '',
+    phoneNumber: '',
+    email: '',
   });
+
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
@@ -35,7 +38,9 @@ export default function AddSale({
       !sale.salesDate ||
       !sale.paymentType ||
       !sale.price ||
-      !sale.income
+      !sale.income ||
+      !sale.phoneNumber ||
+      !sale.email
     ) {
       alert('Please fill out the form correctly.')
     } else {
@@ -47,6 +52,8 @@ export default function AddSale({
             price: sale.price,
             income: [sale.income],
             state: ['not approved'],
+            phoneNumber: sale.phoneNumber,
+            email: sale.email,
             timestamp: serverTimestamp(),
           });
           const q2 = query(collection(db, 'products'), where('vin', '==', sale.vinNumber));
@@ -210,6 +217,42 @@ export default function AddSale({
                               id="income"
                               name="income"
                               value={sale.income}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="phoneNumber"
+                            >
+                              Customer Phone Number
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="phone"
+                              id="phoneNumber"
+                              name="phoneNumber"
+                              value={sale.phoneNumber}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="email"
+                            >
+                              Customer Email
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={sale.email}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }

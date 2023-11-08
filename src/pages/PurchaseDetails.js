@@ -76,7 +76,7 @@ function PurchaseDetails() {
       await updateDoc(docRef, {
         additional: additional,
       });
-      handlePageUpdate()
+      handlePageUpdate();
     } catch (err) {
       console.log(err)
     }

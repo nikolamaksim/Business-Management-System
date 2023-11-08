@@ -1,5 +1,4 @@
-import { db } from "../config/firebase.config";
-import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, getDoc, query, } from 'firebase/firestore';
+import { doc, updateDoc, getDoc,} from 'firebase/firestore';
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -15,7 +14,11 @@ export default function UpdateSale({
 
   const [sale, setSale] = useState({
     salesDate: '',
+    paymentType: updateInfo.paymentType,
+    price: updateInfo.price,
     income: '',
+    phoneNumber: updateInfo.phoneNumber,
+    email: updateInfo.email,
   });
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
@@ -28,17 +31,23 @@ export default function UpdateSale({
 
   // POST Data
   const addSale = async () => {
-    if (!sale.salesDate ||
-        !sale.income ) {
-          alert ('Please fill out the form correctly')
+    if (!sale.income ||
+        !sale.salesDate) {
+          alert('Please fill at least the income and salesDate fields')
         } else {
           try {
             const docRef = doc(collectionRef, updateInfo._id);
             const docSnap = await getDoc(docRef);
             let salesData = docSnap.data();
-            salesData.salesDate.push(sale.salesDate);
-            salesData.income.push(sale.income);
-            salesData.state.push('not approved');
+            if (sale.salesDate && sale.income) {
+              salesData.salesDate.push(sale.salesDate);
+              salesData.income.push(sale.income);
+              salesData.state.push('not approved');
+            }
+            salesData.paymentType = sale.paymentType;
+            salesData.price = sale.price;
+            salesData.phoneNumber = sale.phoneNumber;
+            salesData.email = sale.email;
             await updateDoc(docRef, salesData);
             updateSaleModalSetting();
             handlePageUpdate();
@@ -108,8 +117,7 @@ export default function UpdateSale({
                             <select
                               name="vinNumber"
                               id="vinNumber"
-                              value={sale.vin}
-                              disabled
+                              value={sale.vin}                
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             >
                               <option>{updateInfo.vin}</option>
@@ -153,7 +161,6 @@ export default function UpdateSale({
                               id="paymentType"
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               name="paymentType"
-                              disabled
                             >
                               <option>{updateInfo.paymentType}</option>
                               <option>Partial Payment</option>
@@ -193,6 +200,44 @@ export default function UpdateSale({
                               name="income"
                               value={sale.income}
                               placeholder={updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0)}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="phoneNumber"
+                            >
+                              Customer Phoen Number
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="phone"
+                              id="phoneNumber"
+                              name="phoneNumber"
+                              value={sale.phoneNumber}
+                              placeholder={updateInfo.phoneNumber}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="email"
+                            >
+                              Customer Email
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={sale.email}
+                              placeholder={updateInfo.email}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
