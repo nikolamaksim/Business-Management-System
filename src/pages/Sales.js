@@ -86,36 +86,48 @@ function Sales() {
 
   // Send Receipt
   const sendReceipt = async (element) => {
+    try {
 
-    // Configure EmailJS with your credentials
-    await emailjs.init('A50lpnF13ZR-C8m6D'); 
+      // Configure EmailJS with your credentials
+      await emailjs.init('A50lpnF13ZR-C8m6D'); 
+  
+      const serviceId = 'service_ja7nmca';
+      const templateId = 'template_nlpe56e';
+      const userId = 'A50lpnF13ZR-C8m6D';
+  
+      const emailParams = {
+        to_email: element.email,
+        from_name: 'RAZ AUTO SALE',
+        vin: element.vin,
+        paymentType: element.paymentType,
+        price: element.price,
+        salesDate: element.salesDate[0],
+        lastSalesDate: element.salesDate[element.salesDate.length - 1],
+        lastPay: element.income[element.income.length - 1],
+        totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
+        balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
+        date: new Date().toLocaleDateString(),
+      };
+  
+      emailjs.send(serviceId, templateId, emailParams, userId).then(
+        (response) => {
+          alert('Email sent successfully:', response.text);
+        },
+        (error) => {
+          console.error('Failed to send email:', error);
+        }
+      );
+  
+      await updateDoc(doc(db, 'sales', element._id), {
+        receipt: true,
+      });
 
-    const serviceId = 'service_ja7nmca';
-    const templateId = 'template_nlpe56e';
-    const userId = 'A50lpnF13ZR-C8m6D';
+      handlePageUpdate();
+      
+    } catch (err) {
+      console.log(err);
+    }
 
-    const emailParams = {
-      to_email: element.email,
-      from_name: 'RAZ AUTO SALE',
-      vin: element.vin,
-      paymentType: element.paymentType,
-      price: element.price,
-      salesDate: element.salesDate[0],
-      lastSalesDate: element.salesDate[element.salesDate.length - 1],
-      lastPay: element.income[element.income.length - 1],
-      totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
-      balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
-      date: new Date().toLocaleDateString(),
-    };
-
-    emailjs.send(serviceId, templateId, emailParams, userId).then(
-      (response) => {
-        alert('Email sent successfully:', response.text);
-      },
-      (error) => {
-        console.error('Failed to send email:', error);
-      }
-    );
   };
 
   return (
@@ -288,6 +300,11 @@ function Sales() {
                             </PDFDownloadLink>
                           </td>
                           <td className="whitespace-nowrap px-2 text-gray-700">
+                            {
+                              element.receipt === true
+                              ?
+                              <></>
+                              :
                             <span
                                 className="text-green-700 cursor-pointer"
                                 onClick={() => sendReceipt(element)}
@@ -296,6 +313,7 @@ function Sales() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                               </svg>
                             </span>
+                            }
                           </td>
                         </>
                         :
@@ -428,6 +446,11 @@ function Sales() {
                             </PDFDownloadLink>
                           </td>
                           <td className="whitespace-nowrap px-2 text-gray-700">
+                            {
+                              element.receipt === true
+                              ?
+                              <></>
+                              :
                             <span
                                 className="text-green-700 cursor-pointer"
                                 onClick={() => sendReceipt(element)}
@@ -436,6 +459,7 @@ function Sales() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                               </svg>
                             </span>
+                            }
                           </td>
                         </>
                         :

@@ -54,6 +54,7 @@ export default function AddSale({
             state: ['not approved'],
             phoneNumber: sale.phoneNumber,
             email: sale.email,
+            receipt: false,
             timestamp: serverTimestamp(),
           });
           const q2 = query(collection(db, 'products'), where('vin', '==', sale.vinNumber));
