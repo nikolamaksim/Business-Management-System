@@ -2,6 +2,7 @@ import {collection, getDocs, doc, where, updateDoc, getDoc, query} from 'firebas
 
 import { db } from '../config/firebase.config'
 
+import emailjs from 'emailjs-com';
 import React, { useState, useEffect } from "react";
 import AddSale from "../components/AddSale";
 import {Popover,
@@ -81,6 +82,40 @@ function Sales() {
   // Handle Page Update
   const handlePageUpdate = () => {
     setUpdatePage(!updatePage);
+  };
+
+  // Send Receipt
+  const sendReceipt = async (element) => {
+
+    // Configure EmailJS with your credentials
+    await emailjs.init('A50lpnF13ZR-C8m6D'); 
+
+    const serviceId = 'service_ja7nmca';
+    const templateId = 'template_nlpe56e';
+    const userId = 'A50lpnF13ZR-C8m6D';
+
+    const emailParams = {
+      to_email: element.email,
+      from_name: 'RAZ AUTO SALE',
+      vin: element.vin,
+      paymentType: element.paymentType,
+      price: element.price,
+      salesDate: element.salesDate[0],
+      lastSalesDate: element.salesDate[element.salesDate.length - 1],
+      lastPay: element.income[element.income.length - 1],
+      totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
+      balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
+      date: new Date().toLocaleDateString(),
+    };
+
+    emailjs.send(serviceId, templateId, emailParams, userId).then(
+      (response) => {
+        alert('Email sent successfully:', response.text);
+      },
+      (error) => {
+        console.error('Failed to send email:', error);
+      }
+    );
   };
 
   return (
@@ -240,19 +275,34 @@ function Sales() {
                       {
                         element.state[element.state.length - 1] === 'approved'
                         ?
-                        <td className="whitespace-nowrap px-4 py-2 text-green-700 cursor-pointer hover:bg-slate-100 rounded">
-                          <PDFDownloadLink document={<ReceiptPDF sales={element} />} fileName={`RAS_Receipt_${element.vin} (${new Date().toLocaleDateString()}).pdf`}>
-                            {({ blob, url, loading, error }) =>
-                              loading ? 'Loading document...'
-                               : 
+                        <>
+                          <td className="whitespace-nowrap px-4 py-2 text-green-700 cursor-pointer hover:bg-slate-100 rounded">
+                            <PDFDownloadLink document={<ReceiptPDF sales={element} />} fileName={`RAS_Receipt_${element.vin} (${new Date().toLocaleDateString()}).pdf`}>
+                              {({ blob, url, loading, error }) =>
+                                loading ? 'Loading document...'
+                                : 
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                                </svg>
+                              }
+                            </PDFDownloadLink>
+                          </td>
+                          <td className="whitespace-nowrap px-2 text-gray-700">
+                            <span
+                                className="text-green-700 cursor-pointer"
+                                onClick={() => sendReceipt(element)}
+                              >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                               </svg>
-                            }
-                          </PDFDownloadLink>
-                        </td>
+                            </span>
+                          </td>
+                        </>
                         :
-                        <></>
+                        <>
+                        <td></td>
+                        <td></td>
+                        </>
                       }
                     </tr>
                   );
@@ -364,19 +414,35 @@ function Sales() {
                       {
                         element.state[element.state.length - 1] === 'approved'
                         ?
-                        <td className="whitespace-nowrap px-4 py-2 text-green-700 cursor-pointer hover:bg-slate-100 rounded">
-                          <PDFDownloadLink document={<ReceiptPDF sales={element} />} fileName={`RAS_Receipt_${element.vin} (${new Date().toLocaleDateString()}).pdf`}>
-                            {({ blob, url, loading, error }) =>
-                              loading ? 'Loading document...'
-                               : 
+                        <>
+                          <td className="whitespace-nowrap px-4 py-2 text-green-700 cursor-pointer hover:bg-slate-100 rounded">
+                            <PDFDownloadLink document={<ReceiptPDF sales={element} />} fileName={`RAS_Receipt_${element.vin} (${new Date().toLocaleDateString()}).pdf`}>
+                              {({ blob, url, loading, error }) =>
+                                loading ? 'Loading document...'
+                                
+                                : 
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                                </svg>
+                              }
+                            </PDFDownloadLink>
+                          </td>
+                          <td className="whitespace-nowrap px-2 text-gray-700">
+                            <span
+                                className="text-green-700 cursor-pointer"
+                                onClick={() => sendReceipt(element)}
+                              >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                               </svg>
-                            }
-                          </PDFDownloadLink>
-                        </td>
+                            </span>
+                          </td>
+                        </>
                         :
-                        <></>
+                        <>
+                          <td></td>
+                          <td></td>
+                        </>
                       }
                     </tr>
                   );
@@ -389,6 +455,6 @@ function Sales() {
       </div>
     </div>
   );
-}
+};
 
 export default Sales;

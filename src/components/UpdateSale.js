@@ -31,10 +31,6 @@ export default function UpdateSale({
 
   // POST Data
   const addSale = async () => {
-    if (!sale.income ||
-        !sale.salesDate) {
-          alert('Please fill at least the income and salesDate fields')
-        } else {
           try {
             const docRef = doc(collectionRef, updateInfo._id);
             const docSnap = await getDoc(docRef);
@@ -55,7 +51,6 @@ export default function UpdateSale({
             console.log(err);
           }
         }
-  };
 
   return (
     // Modal

@@ -11,7 +11,6 @@ import ProtectedWrapper from "./ProtectedWrapper";
 import { useEffect, useState } from "react";
 import Sales from "./pages/Sales";
 import PurchaseDetails from "./pages/PurchaseDetails";
-import Register from "./pages/Register";
 
 const App = () => {
   const [user, setUser] = useState("");

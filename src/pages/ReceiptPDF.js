@@ -96,6 +96,7 @@ const ReceiptPDF = ({ sales }) => (
       </View>
       <View style={{...styles.header, backgroundColor: 'gray', position:'absolute', bottom: 0, width: '100%'}}>
         <Text style={{...styles.sectionTitle, color: 'white'}}>Thanks For Going With Our Business.</Text>
+        <Text style={{...styles.sectionContent, color: 'white'}}>{new Date().toLocaleDateString()}</Text>
       </View>
     </Page>
   </Document>
