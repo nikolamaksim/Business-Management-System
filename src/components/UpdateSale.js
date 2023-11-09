@@ -44,6 +44,7 @@ export default function UpdateSale({
             salesData.price = sale.price;
             salesData.phoneNumber = sale.phoneNumber;
             salesData.email = sale.email;
+            salesData.receipt = false;
             await updateDoc(docRef, salesData);
             updateSaleModalSetting();
             handlePageUpdate();
@@ -110,6 +111,7 @@ export default function UpdateSale({
                               VIN Number
                             </label>
                             <select
+                              disabled
                               name="vinNumber"
                               id="vinNumber"
                               value={sale.vin}                
