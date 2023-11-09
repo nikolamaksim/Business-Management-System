@@ -6,7 +6,7 @@ function SideMenu() {
 
   return (
     <>
-      {JSON.parse(localStorage.getItem('user')).email === 'peter95613@gmail.com'
+      {JSON.parse(localStorage.getItem('user')).role === 'super'
           ?
           <div className="h-full flex-col justify-between bg-white hidden lg:flex ">
             <div className="px-4 py-6">
@@ -50,6 +50,14 @@ function SideMenu() {
                 >
                   <img alt="sale-icon" src={require("../assets/supplier-icon.png")} />
                   <span className="text-sm font-medium"> Sales</span>
+                </Link>
+
+                <Link
+                  to="/users"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
+                >
+                  <img alt="sale-icon" src={require("../assets/supplier-icon.png")} />
+                  <span className="text-sm font-medium"> Users</span>
                 </Link>
 
               </nav>

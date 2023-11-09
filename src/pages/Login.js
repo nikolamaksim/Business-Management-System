@@ -40,9 +40,7 @@ function Login() {
               if (docSnap.docs[0].data().password !== form.password) {
                 alert("Password doesn't match.")
               } else {
-                console.log(docSnap.docs[0].id);
                   localStorage.setItem('user', JSON.stringify({...docSnap.docs[0].data(), _id: docSnap.docs[0].id}));
-                  console.log(localStorage.getItem('user'));
                   authContext.signin(docSnap.docs[0].id, () => {
                   navigate("/");
                 })

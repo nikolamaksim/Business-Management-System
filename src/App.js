@@ -11,6 +11,7 @@ import ProtectedWrapper from "./ProtectedWrapper";
 import { useEffect, useState } from "react";
 import Sales from "./pages/Sales";
 import PurchaseDetails from "./pages/PurchaseDetails";
+import Users from "./pages/Users";
 
 const App = () => {
   const [user, setUser] = useState("");
@@ -67,13 +68,14 @@ const App = () => {
             }
           >
             {
-              localStorage.getItem('user') && JSON.parse(localStorage.user).email === 'peter95613@gmail.com'
+              localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role === 'super'
               ?
               <>
               <Route index element={<Dashboard />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/purchase" element={<PurchaseDetails />} />
               <Route path="/sales" element={<Sales />} />
+              <Route path="/users" element={<Users />} />
               </>
               :
               <>

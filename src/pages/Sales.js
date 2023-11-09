@@ -123,7 +123,7 @@ function Sales() {
       });
 
       handlePageUpdate();
-      
+
     } catch (err) {
       console.log(err);
     }
@@ -171,7 +171,7 @@ function Sales() {
           </div>
 
           {
-            JSON.parse(localStorage.getItem('user')).email === 'peter95613@gmail.com'
+            JSON.parse(localStorage.getItem('user')).role === 'super'
             ?
             <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">
               <thead>

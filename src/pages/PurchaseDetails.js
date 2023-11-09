@@ -152,7 +152,7 @@ function PurchaseDetails() {
             </div>
           </div>
           {
-            JSON.parse(localStorage.getItem('user')).email === 'peter95613@gmail.com'
+            JSON.parse(localStorage.getItem('user')).role === 'super'
             ?
             <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
               <thead>
