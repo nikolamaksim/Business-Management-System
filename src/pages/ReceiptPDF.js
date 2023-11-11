@@ -65,28 +65,30 @@ const ReceiptPDF = ({ sales }) => (
     <Page size="A4" style={styles.page}>
       <View style={{...styles.header, backgroundColor:'gray'}}>
         <Text style={{...styles.title, color: 'white'}}>RAZ AUTO SALE</Text>
-        <Text style={{...styles.contact, color: 'white'}}>Contact Details: razackissa@gmail.com | 123-456-7890</Text>
+        <Text style={{...styles.contact, color: 'white'}}>Contactez-nous: razackissa@gmail.com | +229 62 31 34 95</Text>
       </View>
       <View style={styles.header}>
-        <Text style={{...styles.sectionContent, textAlign: 'left'}}>You bought our car of</Text>
-        <Text style={styles.title}>{sales.vin}</Text>
+        <Text style={{...styles.sectionContent, textAlign: 'left'}}>Vous avez acheté votre voiture de</Text>
+        <Text style={styles.sectionTitle}>{sales.manufacturer} {sales.model}({sales.year})</Text>
+        <Text style={styles.sectionTitle}>VIN: {sales.vin} </Text>
       </View>
       <View style={styles.sectionContainer}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Customer</Text>
-          <Text style={styles.sectionContent}>Phone Number: {sales.phoneNumber}</Text>
-          <Text style={styles.sectionContent}>Email: {sales.email}</Text>
+          <Text style={styles.sectionTitle}>Cliente</Text>
+          <Text style={styles.sectionContent}>{sales.customerName}</Text>
+          <Text style={styles.sectionContent}>Numéro de téléphone: {sales.phoneNumber}</Text>
+          <Text style={styles.sectionContent}>E-mail: {sales.email}</Text>
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contract Details</Text>
-          <Text style={styles.sectionContent}>Payment Type: {sales.paymentType}</Text>
-          <Text style={styles.sectionContent}>Total Price/$: {sales.price}</Text>
-          <Text style={{...styles.sectionContent, fontWeight:'bold', color: 'orange'}}>OutStanding Balance/$: {parseInt(sales.price) - sales.income.reduce((sum, a) => sum += parseInt(a), 0)}</Text>
+          <Text style={styles.sectionTitle}>Détails du contrat</Text>
+          <Text style={styles.sectionContent}>Type de paiement: {sales.paymentType}</Text>
+          <Text style={styles.sectionContent}>Prix ​total/$: {sales.price}</Text>
+          <Text style={{...styles.sectionContent, fontWeight:'bold', color: 'orange'}}>Solde impayé/$: {parseInt(sales.price) - sales.income.reduce((sum, a) => sum += parseInt(a), 0)}</Text>
         </View>
       </View>
       <View style={styles.sectionContainer}>
         <View style={styles.fullsection}>
-          <Text style={styles.sectionTitle}>Payment History</Text>
+          <Text style={styles.sectionTitle}>Historique de paiement</Text>
           {Array.from({ length: sales.income.length }, (_, index) => index).map((i) => {
             return (
               <Text style={styles.sectionContent}>{sales.salesDate[i]}: ${sales.income[i]}</Text>
@@ -95,7 +97,7 @@ const ReceiptPDF = ({ sales }) => (
         </View>
       </View>
       <View style={{...styles.header, backgroundColor: 'gray', position:'absolute', bottom: 0, width: '100%'}}>
-        <Text style={{...styles.sectionTitle, color: 'white'}}>Thanks For Going With Our Business.</Text>
+        <Text style={{...styles.sectionTitle, color: 'white'}}>Merci d'être venu avec notre entreprise.</Text>
         <Text style={{...styles.sectionContent, color: 'white'}}>{new Date().toLocaleDateString()}</Text>
       </View>
     </Page>

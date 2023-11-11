@@ -2,7 +2,6 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>A simple, clean, and responsive HTML invoice template</title>
 
 		<style>
 			.invoice-box {
@@ -119,68 +118,107 @@
 					</td>
 				</tr>
 
-				<tr class="information">
+				<tr class="top">
 					<td colspan="2">
 						<table>
 							<tr>
 								<td>
-									RAZ AUTO SALE<br />
-									12345 Industrial Road<br />
-									Sunnyville, CA 12345
-								</td>
-								<td>
-									Contact Us:<br />
-									Phone Number: 111 111 1111<br />
-									Email: peter95613@gmail.com
+									Bonjour {{customerName}}. Merci d'avoir acheté notre produit de {{manufacturer}} {{model}}({{year}}).
 								</td>
 							</tr>
 						</table>
 					</td>
 				</tr>
 
+				<tr class="information">
+					<td colspan="2">
+						<table>
+							<tr>
+								<td>
+									Raz Auto Sale<br />
+									12345 Industrial Road<br />
+									Sunnyville, CA 12345
+								</td>
+								<td>
+									Contactez-nous<br />
+									Phone Number: +229 62 31 34 95<br />
+									Email: razackissa@gmail.com
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+
+                <tr class="heading">
+                    <td>Informations sur la voiture</td>
+                    <td></td>   
+                </tr>
+
+                <tr class="item">
+                    <td>Numéro VIN</td>
+                    <td>{{vin}}</td>   
+                </tr>
+
+                <tr class="item">
+                    <td>Fabricante</td>
+                    <td>{{manufacturer}}</td>   
+                </tr>
+
+                <tr class="item">
+                    <td>Modèle</td>
+                    <td>{{model}}</td>   
+                </tr>
+
+                <tr class="item">
+                    <td>Année</td>
+                    <td>{{year}}</td>   
+                </tr>
+
 				<tr class="heading">
-					<td>Contract Details</td>
+					<td>Détails du contrat</td>
 
-					<td>created at {{salesDate}}</td>
+					<td>créé en {{salesDate}}</td>
 				</tr>
 
 				<tr class="item">
-					<td>Payment Type</td>
+					<td>Type de paiement</td>
 
-					<td>${{paymentType}}</td>
+					<td>{{paymentType}}</td>
 				</tr>
 
 				<tr class="item">
-					<td>Price</td>
+					<td>Prix</td>
 
 					<td>${{price}}</td>
 				</tr>
 
 				<tr class="item">
-					<td>Last Payment</td>
+					<td>Dernier paiement</td>
 
 					<td>${{lastPay}}</td>
 				</tr>
 
 				<tr class="item">
-					<td>Last Payment Date</td>
+					<td>Date du dernier paiement</td>
 
 					<td>{{lastSalesDate}}</td>
 				</tr>
 
 				<tr class="item last">
-					<td>Total Payment</td>
+					<td>Paiement total</td>
 
 					<td>${{totalPay}}</td>
 				</tr>
 
 				<tr class="total">
-					<td>Your Outstanding Balance: </td>
+					<td>Solde impayé </td>
 
-					<td>${{balance}}</td>
+					<td><b>${{balance}}</b></td>
 				</tr>
+
 			</table>
-  <p>This email was sent to {{to_email}} to confirm your last payment for our product. (VIN: {{vin}}) Thanks for going with our business. 🌟 Have a great day! 🌟</p>
+            
+            <p>Cet e-mail a été envoyé à {{to_email}} pour confirmer votre dernier paiement pour notre produit. (VIN : {{vin}}) Merci. 🌟 Bonne journée ! 🌟</p>
 		</div>
 	</body>
 </html>

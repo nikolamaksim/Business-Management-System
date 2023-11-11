@@ -41,10 +41,12 @@ function PurchaseDetails() {
   // Delete Item
   const deleteItem = async (id) => {
     try {
-      window.confirm("Are you sure to delete this item?");
       const documentRef = doc(db, 'products', id);
-      await deleteDoc(documentRef);
-      handlePageUpdate();
+      const confirm = window.confirm("Are you sure to delete this item?");
+      if (confirm === true) {
+        await deleteDoc(documentRef);
+        handlePageUpdate();
+      }
     } catch (err) {
       console.log(err);
     }

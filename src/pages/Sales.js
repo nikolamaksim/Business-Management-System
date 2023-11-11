@@ -99,6 +99,10 @@ function Sales() {
         to_email: element.email,
         from_name: 'RAZ AUTO SALE',
         vin: element.vin,
+        manufacturer: element.manufacturer,
+        model: element.model,
+        year: element.year,
+        customerName: element.customerName,
         paymentType: element.paymentType,
         price: element.price,
         salesDate: element.salesDate[0],
@@ -199,6 +203,9 @@ function Sales() {
                     Approval State
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    Customer Name
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     Customer Phone Number
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -254,6 +261,9 @@ function Sales() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {element.customerName}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100 rounded">
                         <a href={`tel: ${element.phoneNumber}`}>
@@ -354,6 +364,9 @@ function Sales() {
                     Approval State
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    Customer Name
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     Customer Phone Number
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -409,6 +422,9 @@ function Sales() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {element.customerName}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100 rounded">
                         <a href={`tel: ${element.phoneNumber}`}>
