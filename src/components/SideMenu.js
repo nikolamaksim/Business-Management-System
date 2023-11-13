@@ -71,6 +71,18 @@ function SideMenu() {
                   <span className="text-sm font-medium"> Users</span>
                 </Link>
 
+                <Link
+                  to="/imageupload"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
+                >
+                  <img 
+                    className="w-5"
+                    alt="user-icons" 
+                    src={require("../assets/new_icons/image.png")} 
+                  />
+                  <span className="text-sm font-medium"> Image Upload</span>
+                </Link>
+
               </nav>
             </div>
             <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
@@ -111,7 +123,7 @@ function SideMenu() {
                   <img
                   className="w-5"
                     alt="purchase-icon"
-                    src={require("../assets/new_icons/sales.png")}
+                    src={require("../assets/new_icons/purchase.png")}
                   />
                   <span className="text-sm font-medium"> Expense </span>
                 </Link>
@@ -120,8 +132,20 @@ function SideMenu() {
                   to="/sales"
                   className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
                 >
-                  <img className="w-5" alt="sale-icon" src={require("../assets/supplier-icon.png")} />
+                  <img className="w-5" alt="sale-icon" src={require("../assets/new_icons/sales.png")} />
                   <span className="text-sm font-medium"> Sales</span>
+                </Link>
+
+                <Link
+                  to="/imageupload"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
+                >
+                  <img 
+                    className="w-5"
+                    alt="user-icons" 
+                    src={require("../assets/new_icons/image.png")} 
+                  />
+                  <span className="text-sm font-medium"> Image Upload</span>
                 </Link>
 
             </nav>

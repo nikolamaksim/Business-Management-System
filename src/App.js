@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Sales from "./pages/Sales";
 import PurchaseDetails from "./pages/PurchaseDetails";
 import Users from "./pages/Users";
+import ImageUpload from "./pages/ImageUpload";
 
 const App = () => {
   const [user, setUser] = useState("");
@@ -76,12 +77,14 @@ const App = () => {
               <Route path="/purchase" element={<PurchaseDetails />} />
               <Route path="/sales" element={<Sales />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/imageupload" element={<ImageUpload />} />
               </>
               :
               <>
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/purchase" element={<PurchaseDetails />} />
               <Route path="/sales" element={<Sales />} />
+              <Route path="/imageupload" element={<ImageUpload />} />
               </>
             }
           </Route>

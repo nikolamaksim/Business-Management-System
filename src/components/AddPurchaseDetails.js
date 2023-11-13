@@ -19,6 +19,9 @@ export default function AddPurchaseDetails({
     condition: "",
     initial: "",
     additional: [],
+    mainImageName: '',
+    mainImageUrl: '',
+    slideImageUrl: [],
   });
 
   const [open, setOpen] = useState(true);
