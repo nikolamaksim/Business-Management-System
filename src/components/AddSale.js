@@ -47,22 +47,6 @@ export default function AddSale({
       alert('Please fill out the form correctly.')
     } else {
       try {
-<<<<<<< HEAD
-          await addDoc(collectionRef, {
-            vin: sale.vinNumber,
-            salesDate: [sale.salesDate],
-            paymentType: sale.paymentType,
-            price: sale.price,
-            income: [sale.income],
-            state: ['not approved'],
-            phoneNumber: sale.phoneNumber,
-            email: sale.email,
-            receipt: false,
-            timestamp: serverTimestamp(),
-          });
-=======
-
->>>>>>> main
           const q2 = query(collection(db, 'products'), where('vin', '==', sale.vinNumber));
           const docSnap = await getDocs(q2);
           let product_id = docSnap.docs[0].id;
