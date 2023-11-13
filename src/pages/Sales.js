@@ -89,31 +89,20 @@ function Sales() {
     try {
 
       // Configure EmailJS with your credentials
-<<<<<<< HEAD
-      await emailjs.init('A50lpnF13ZR-C8m6D'); 
-  
-      const serviceId = 'service_ja7nmca';
-      const templateId = 'template_nlpe56e';
-      const userId = 'A50lpnF13ZR-C8m6D';
-=======
       await emailjs.init('BGnkmVYSCeuwRTU6g'); 
   
       const serviceId = 'service_2k35nxg';
       const templateId = 'template_zvmgj4s';
       const userId = 'BGnkmVYSCeuwRTU6g';
->>>>>>> main
   
       const emailParams = {
         to_email: element.email,
         from_name: 'RAZ AUTO SALE',
         vin: element.vin,
-<<<<<<< HEAD
-=======
         manufacturer: element.manufacturer,
         model: element.model,
         year: element.year,
         customerName: element.customerName,
->>>>>>> main
         paymentType: element.paymentType,
         price: element.price,
         salesDate: element.salesDate[0],
@@ -127,8 +116,6 @@ function Sales() {
       emailjs.send(serviceId, templateId, emailParams, userId).then(
         (response) => {
           alert('Email sent successfully:', response.text);
-<<<<<<< HEAD
-=======
   
           updateDoc(doc(db, 'sales', element._id), {
             receipt: true,
@@ -136,23 +123,11 @@ function Sales() {
             handlePageUpdate();
           }
           );
->>>>>>> main
         },
         (error) => {
           console.error('Failed to send email:', error);
         }
       );
-<<<<<<< HEAD
-  
-      await updateDoc(doc(db, 'sales', element._id), {
-        receipt: true,
-      });
-
-      handlePageUpdate();
-      
-=======
-
->>>>>>> main
     } catch (err) {
       console.log(err);
     }
