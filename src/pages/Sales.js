@@ -89,16 +89,31 @@ function Sales() {
     try {
 
       // Configure EmailJS with your credentials
+<<<<<<< HEAD
       await emailjs.init('A50lpnF13ZR-C8m6D'); 
   
       const serviceId = 'service_ja7nmca';
       const templateId = 'template_nlpe56e';
       const userId = 'A50lpnF13ZR-C8m6D';
+=======
+      await emailjs.init('BGnkmVYSCeuwRTU6g'); 
+  
+      const serviceId = 'service_2k35nxg';
+      const templateId = 'template_zvmgj4s';
+      const userId = 'BGnkmVYSCeuwRTU6g';
+>>>>>>> main
   
       const emailParams = {
         to_email: element.email,
         from_name: 'RAZ AUTO SALE',
         vin: element.vin,
+<<<<<<< HEAD
+=======
+        manufacturer: element.manufacturer,
+        model: element.model,
+        year: element.year,
+        customerName: element.customerName,
+>>>>>>> main
         paymentType: element.paymentType,
         price: element.price,
         salesDate: element.salesDate[0],
@@ -112,11 +127,22 @@ function Sales() {
       emailjs.send(serviceId, templateId, emailParams, userId).then(
         (response) => {
           alert('Email sent successfully:', response.text);
+<<<<<<< HEAD
+=======
+  
+          updateDoc(doc(db, 'sales', element._id), {
+            receipt: true,
+          }).then(() => {
+            handlePageUpdate();
+          }
+          );
+>>>>>>> main
         },
         (error) => {
           console.error('Failed to send email:', error);
         }
       );
+<<<<<<< HEAD
   
       await updateDoc(doc(db, 'sales', element._id), {
         receipt: true,
@@ -124,6 +150,9 @@ function Sales() {
 
       handlePageUpdate();
       
+=======
+
+>>>>>>> main
     } catch (err) {
       console.log(err);
     }
@@ -171,7 +200,7 @@ function Sales() {
           </div>
 
           {
-            JSON.parse(localStorage.getItem('user')).email === 'peter95613@gmail.com'
+            JSON.parse(localStorage.getItem('user')).role === 'super'
             ?
             <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">
               <thead>
@@ -196,6 +225,9 @@ function Sales() {
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     Approval State
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    Customer Name
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     Customer Phone Number
@@ -253,6 +285,9 @@ function Sales() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {element.customerName}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100 rounded">
                         <a href={`tel: ${element.phoneNumber}`}>
@@ -353,6 +388,9 @@ function Sales() {
                     Approval State
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    Customer Name
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     Customer Phone Number
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -408,6 +446,9 @@ function Sales() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                        {element.customerName}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100 rounded">
                         <a href={`tel: ${element.phoneNumber}`}>

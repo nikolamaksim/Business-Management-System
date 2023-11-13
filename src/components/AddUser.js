@@ -1,67 +1,63 @@
-import { addDoc, getDocs, serverTimestamp, query, where } from "firebase/firestore";
+import { addDoc, serverTimestamp } from 'firebase/firestore';
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-export default function AddPurchaseDetails({
+export default function AddUser({
   collectionRef,
-  addSaleModalSetting,
+  addUserModalSetting,
   handlePageUpdate,
 }) {
 
-  const [purchase, setPurchase] = useState({
-    vin: "",
-    manufacturer: "",
-    model: "",
-    year: "",
-    purchaseDate: "",
-    condition: "",
-    initial: "",
-    additional: [],
-    mainImageName: '',
-    mainImageUrl: '',
-    slideImageUrl: [],
+  const [user, setUser] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: '',
+    password: '',
+    role: '',
   });
 
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
+
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
-    setPurchase({ ...purchase, [key]: value });
+    setUser({ ...user, [key]: value });
   };
 
-  // Add Purchase Data
-  const addSale = async () => {
-    if (!purchase.vin || 
-        !purchase.manufacturer || 
-        !purchase.model || 
-        !purchase.year || 
-        !purchase.purchaseDate || 
-        !purchase.condition || 
-        !purchase.condition || 
-        !purchase.initial) {
-          alert('Please fill out the form correctly.')
-        } else {
-          try {
-            const docCheck = await getDocs(query(collectionRef, where('vin', '==', purchase.vin)));
-            if (docCheck.empty) {
-              try {
-                await addDoc(collectionRef, {...purchase, timestamp: serverTimestamp(), state: 'not on sale'});
-                addSaleModalSetting();
-                handlePageUpdate();
-              } catch (err) {
-                console.log(err);
-              }
-            } else {
-              alert ('The car information already exists. Please check the VIN number again.')
-            }
-          } catch (err) {
-            console.log(err);
-          }
-        }
-  }
+  // POST Data
+  const addUser = async () => {
+    if (
+        !user.firstName ||
+        !user.lastName ||
+        !user.phoneNumber ||
+        !user.email ||
+        !user.password ||
+        !user.role
+    ) {
+      alert('Please fill out the form correctly.')
+    } else {
+      try {
+          await addDoc(collectionRef, {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
+            email: user.email,
+            password: user.password,
+            role: user.role,
+            timestamp: serverTimestamp(),
+          });
+          addUserModalSetting();
+          handlePageUpdate();
+        } catch (err) {
+          alert(err);
+          console.log(err);
+        } 
+      }
+    }
 
   return (
     // Modal
@@ -109,140 +105,127 @@ export default function AddPurchaseDetails({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        Purchase Details
+                        Add New User
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
                           <div>
                             <label
-                              htmlFor="vin"
+                              htmlFor="firstName"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              VIN Number
+                              First Name
                             </label>
                             <input
-                              id="vin"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              name="vin"
-                              placeholder="Input VIN Number"
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
+                                type="text"
+                                name="firstName"
+                                id="firstName"
+                                value={user.firstName}
+                                onChange={(e) =>
+                                    handleInputChange(e.target.name, e.target.value)
+                                }
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             />
                           </div>
+
                           <div>
                             <label
-                              htmlFor="manufacturer"
+                              htmlFor="lastName"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Make
+                              Last Name
                             </label>
                             <input
                               type="text"
-                              name="manufacturer"
-                              id="manufacturer"
-                              value={purchase.manufacturer}
+                              name="lastName"
+                              id="lastName"
+                              value={user.lastName}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Input Manufacturer"
                             />
                           </div>
+
                           <div>
                             <label
-                              htmlFor="model"
+                              htmlFor="phoneNumber"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              model
+                              Phone Number
                             </label>
                             <input
+                                type="phone"
+                                id="phoneNumber"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                name="phoneNumber"
+                                onChange={(e) =>
+                                    handleInputChange(e.target.name, e.target.value)
+                                }
+                            />
+                          </div>
+
+                          <div>
+                            <label
+                              htmlFor="email"
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                            >
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              name="email"
+                              id="email"
+                              value={user.email}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            />
+                          </div>
+
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="password"
+                            >
+                              Password
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               type="text"
-                              name="model"
-                              id="model"
-                              value={purchase.model}
+                              id="password"
+                              name="password"
+                              value={user.password}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Input Model"
                             />
                           </div>
-                          <div>
-                            <label
-                              htmlFor="year"
-                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                            >
-                              Year
-                            </label>
-                            <input
-                              type="number"
-                              name="year"
-                              id="price"
-                              value={purchase.year}
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Year"
-                            />
-                          </div>
+
                           <div>
                             <label
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                              htmlFor="purchaseDate"
+                              htmlFor="role"
                             >
-                              Purchase Date
+                              User Role
                             </label>
-                            <input
+                            <select
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              type="date"
-                              id="purchaseDate"
-                              name="purchaseDate"
-                              value={purchase.purchaseDate}
+                              id="role"
+                              name="role"
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
-                            />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="condition"
-                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Condition
-                            </label>
-                            <input
-                              type="text"
-                              name="condition"
-                              id="condition"
-                              value={purchase.condition}
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Condition of the Car"
-                            />
+                              <option disabled selected>Select User Role</option>
+                              <option>super</option>
+                              <option>normal</option>
+                            </select>
                           </div>
-                          <div>
-                            <label
-                              htmlFor="initial"
-                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                            >
-                              Initial Purchase Amount
-                            </label>
-                            <input
-                              type="number"
-                              name="initial"
-                              id="initial"
-                              value={purchase.initial}
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Initial Amount"
-                            />
-                          </div>
+
+                        </div>
+                        <div className="flex items-center space-x-4">
                         </div>
                       </form>
                     </div>
@@ -252,14 +235,14 @@ export default function AddPurchaseDetails({
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
-                    onClick={addSale}
+                    onClick={addUser}
                   >
-                    Add
+                    Add New User
                   </button>
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={() => addSaleModalSetting()}
+                    onClick={() => addUserModalSetting()}
                     ref={cancelButtonRef}
                   >
                     Cancel

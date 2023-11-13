@@ -40,9 +40,7 @@ function Login() {
               if (docSnap.docs[0].data().password !== form.password) {
                 alert("Password doesn't match.")
               } else {
-                console.log(docSnap.docs[0].id);
                   localStorage.setItem('user', JSON.stringify({...docSnap.docs[0].data(), _id: docSnap.docs[0].id}));
-                  console.log(localStorage.getItem('user'));
                   authContext.signin(docSnap.docs[0].id, () => {
                   navigate("/");
                 })
@@ -53,46 +51,6 @@ function Login() {
           }
         }
   }
-
-  // const authCheck = () => {
-  //   setTimeout(() => {
-  //     fetch("http://localhost:4000/api/login")
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         localStorage.setItem("user", JSON.stringify(data));
-  //         authContext.signin(data._id, () => {
-  //           navigate("/");
-  //         });
-  //       })
-  //       .catch((err) => {
-  //         alert("Wrong credentials, Try again")
-  //         console.log(err);
-  //       });
-  //   }, 3000);
-  // };
-
-  // const loginUser = (e) => {
-    // Cannot send empty data
-  //   if (form.email === "" || form.password === "") {
-  //     alert("To login user, enter details to proceed...");
-  //   } else {
-  //     fetch("http://localhost:4000/api/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-type": "application/json",
-  //       },
-  //       body: JSON.stringify(form),
-  //     })
-  //       .then((result) => {
-  //         console.log("User login");
-  //       })
-  //       .catch((error) => {
-  //         console.log("Something went wrong ", error);
-  //       });
-  //   }
-  //   authCheck();
-  // };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
