@@ -44,7 +44,7 @@ export default function AddSale({
       !sale.phoneNumber ||
       !sale.email
     ) {
-      alert('Please fill out the form correctly.')
+      alert('Veuillez remplir correctement le formulaire.')
     } else {
       try {
           const q2 = query(collection(db, 'products'), where('vin', '==', sale.vinNumber));

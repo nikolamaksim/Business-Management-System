@@ -45,7 +45,7 @@ export default function AddPurchaseDetails({
         !purchase.location || 
         !purchase.location || 
         !purchase.initial) {
-          alert('Please fill out the form correctly.')
+          alert('Veuillez remplir correctement le formulaire.')
         } else {
           try {
             const docCheck = await getDocs(query(collectionRef, where('vin', '==', purchase.vin)));
@@ -58,7 +58,7 @@ export default function AddPurchaseDetails({
                 console.log(err);
               }
             } else {
-              alert ('The car information already exists. Please check the VIN number again.')
+              alert ('Les informations sur la voiture existent déjà. Veuillez vérifier à nouveau le numéro VIN.')
             }
           } catch (err) {
             console.log(err);

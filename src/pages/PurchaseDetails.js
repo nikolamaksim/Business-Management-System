@@ -42,7 +42,7 @@ function PurchaseDetails() {
   const deleteItem = async (id) => {
     try {
       const documentRef = doc(db, 'products', id);
-      const confirm = window.confirm("Are you sure to delete this item?");
+      const confirm = window.confirm("Êtes-vous sûr de supprimer cet élément ?");
       if (confirm === true) {
         await deleteDoc(documentRef);
         handlePageUpdate();

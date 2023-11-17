@@ -29,16 +29,16 @@ function Login() {
   const loginUser = async () => {
     if (!form.email ||
         !form.password) {
-          alert('Please fill out the form correctly.');
+          alert('Veuillez remplir correctement le formulaire.');
         } else {
           try {
             const q = query(collection(db, 'users'), where('email', '==', form.email));
             const docSnap = await getDocs(q);
             if (!docSnap.docs[0]) {
-              alert("The user doesn't exist.")
+              alert("L'utilisateur n'existe pas.")
             } else {
               if (docSnap.docs[0].data().password !== form.password) {
-                alert("Password doesn't match.")
+                alert("Le mot de passe ne correspond pas.")
               } else {
                   localStorage.setItem('user', JSON.stringify({...docSnap.docs[0].data(), _id: docSnap.docs[0].id}));
                   authContext.signin(docSnap.docs[0].id, () => {

@@ -87,8 +87,8 @@ function Sales() {
   // Send Receipt
   const sendReceipt = async (element) => {
     try {
-      const confirm = window.confirm('Are you sure?');
-      if (confirm == true) {      // Configure EmailJS with your credentials
+      const confirm = window.confirm('Es-tu sûr?');
+      if (confirm === true) {      // Configure EmailJS with your credentials
         await emailjs.init('BGnkmVYSCeuwRTU6g'); 
     
         const serviceId = 'service_2k35nxg';
@@ -115,7 +115,7 @@ function Sales() {
     
         emailjs.send(serviceId, templateId, emailParams, userId).then(
           (response) => {
-            alert('Email sent successfully:', response.text);
+            alert('E-mail envoyé avec succès:', response.text);
     
             updateDoc(doc(db, 'sales', element._id), {
               receipt: true,
@@ -125,7 +125,7 @@ function Sales() {
             );
           },
           (error) => {
-            console.error('Failed to send email:', error);
+            console.error("Échec de l'envoi de l'e-mail :", error);
           }
         );
       } 

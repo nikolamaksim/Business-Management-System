@@ -38,7 +38,7 @@ export default function AddUser({
         !user.password ||
         !user.role
     ) {
-      alert('Please fill out the form correctly.')
+      alert('Veuillez remplir correctement le formulaire.')
     } else {
       try {
           await addDoc(collectionRef, {

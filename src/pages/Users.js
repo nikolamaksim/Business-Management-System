@@ -9,7 +9,6 @@ function Users() {
 
   const collectionRef = collection(db, 'users');
 
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showUserModal, setUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [updatePage, setUpdatePage] = useState(true);

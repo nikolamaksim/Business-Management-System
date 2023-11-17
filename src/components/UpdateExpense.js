@@ -45,7 +45,7 @@ export default function UpdateExpense({
         console.log(err);
       }
     } else {
-      alert('Please fill out the form correctly.');
+      alert('Veuillez remplir correctement le formulaire.');
     }      
   };
 
