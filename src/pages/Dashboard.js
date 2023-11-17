@@ -854,6 +854,7 @@ function Dashboard() {
                             <p>supplémentaire/$</p>
                             <p>totale/$</p>
                             <p>statut</p>
+                            <p>explication</p>
                           </div>
                           <div className="grid col-span-1">
                           </div>
@@ -866,6 +867,7 @@ function Dashboard() {
                             <p>{expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
                             <p>{expense.initial + expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
                             <p>{expense.state}</p>
+                            <p>{expense.additional[i].reason}</p>
                           </div>
                         </div>
                       </PopoverContent>
