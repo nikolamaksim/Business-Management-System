@@ -632,7 +632,33 @@ function Dashboard() {
                     date >= salesDateRange.from && date <= salesDateRange.to
                     ?
                     <tr key={`${sale.vin}-revenue-${i}`}>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.vin}</td>
+                    <Popover>
+                      <PopoverHandler>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{sale.vin}</td>
+                      </PopoverHandler>
+                      <PopoverContent>
+                        <div className="grid grid-cols-5">
+                          <div className="grid col-span-2">
+                            <p>prix/$</p>
+                            <p>ventes montante/$</p>
+                            <p>ventes équilibre/$</p>
+                            <p>nom du client</p>
+                            <p>numéro de téléphone du client</p>
+                            <p>email client</p>
+                          </div>
+                          <div className="grid col-span-1">
+                          </div>
+                          <div className="grid col-span-2">
+                            <p>{sale.price}</p>
+                            <p>{sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
+                            <p>{sale.price - sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
+                            <p>{sale.customerName}</p>
+                            <p>{sale.phoneNumber}</p>
+                            <p>{sale.email}</p>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{date}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.income[i]}</td>
                     </tr>
@@ -813,7 +839,37 @@ function Dashboard() {
                     date >= expenseDateRange.from && date <= expenseDateRange.to
                     ?
                     <tr key={`${expense.vin}-expense-${i}`}>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{expense.vin}</td>
+                    <Popover>
+                      <PopoverHandler>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{expense.vin}</td>
+                      </PopoverHandler>
+                      <PopoverContent>
+                        <div className="grid grid-cols-5">
+                          <div className="grid col-span-2">
+                            <p>fabricante</p>
+                            <p>modèle</p>
+                            <p>année</p>
+                            <p>emplacement</p>
+                            <p>initiales/$</p>
+                            <p>supplémentaire/$</p>
+                            <p>totale/$</p>
+                            <p>statut</p>
+                          </div>
+                          <div className="grid col-span-1">
+                          </div>
+                          <div className="grid col-span-2">
+                            <p>{expense.manufacturer}</p>
+                            <p>{expense.model}</p>
+                            <p>{expense.year}</p>
+                            <p>{expense.location}</p>
+                            <p>{expense.initial}</p>
+                            <p>{expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
+                            <p>{expense.initial + expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
+                            <p>{expense.state}</p>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{date}</td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-900">{expense.additional[i].amount}</td>
                     </tr>
