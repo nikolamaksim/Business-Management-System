@@ -8,15 +8,15 @@ import AuthContext from "../AuthContext";
 import { Link } from "react-router-dom";
 
 const navigation = [
-  { name: "Dashboard", href: "/", current: true },
-  { name: "Inventory", href: "/inventory", current: false },
-  { name: "Purchase Details", href: "/purchase", current: false },
-  { name: "Sales", href: "/sales", current: false },
-  { name: "Users", href: "/users", current: false },
-  { name: "Image Upload", href: "/imageupload", current: false },
+  { name: "tableau de bord", href: "/", current: true },
+  { name: "inventaire", href: "/inventory", current: false },
+  { name: "dépenses", href: "/purchase", current: false },
+  { name: "ventes", href: "/sales", current: false },
+  { name: "utilisateur", href: "/users", current: false },
+  { name: "Téléchargement d'images", href: "/imageupload", current: false },
 ];
 
-const userNavigation = [{ name: "Sign out", href: "./login" }];
+const userNavigation = [{ name: "se déconnecter", href: "./login" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

@@ -20,7 +20,7 @@ function SideMenu() {
                     alt="dashboard-icon"
                     src={require("../assets/new_icons/dashboard.png")}
                   />
-                  <span className="text-sm font-medium"> Dashboard </span>
+                  <span className="text-sm font-medium"> tableau de bord </span>
                 </Link>
 
                 <Link
@@ -32,7 +32,7 @@ function SideMenu() {
                     alt="inventory-icon"
                     src={require("../assets/new_icons/inventory.png")}
                   />
-                  <span className="text-sm font-medium"> Inventory </span>
+                  <span className="text-sm font-medium"> inventaire </span>
                 </Link>
 
                 <Link
@@ -44,7 +44,7 @@ function SideMenu() {
                     alt="purchase-icon"
                     src={require("../assets/new_icons/purchase.png")}
                   />
-                  <span className="text-sm font-medium"> Expense </span>
+                  <span className="text-sm font-medium"> dépenses </span>
                 </Link>
 
                 <Link
@@ -56,7 +56,7 @@ function SideMenu() {
                    alt="sale-icon"
                    src={require("../assets/new_icons/sales.png")}
                     />
-                  <span className="text-sm font-medium"> Sales</span>
+                  <span className="text-sm font-medium"> ventes</span>
                 </Link>
 
                 <Link
@@ -68,7 +68,7 @@ function SideMenu() {
                     alt="user-icons" 
                     src={require("../assets/new_icons/users.png")} 
                   />
-                  <span className="text-sm font-medium"> Users</span>
+                  <span className="text-sm font-medium"> utilisateur </span>
                 </Link>
 
                 <Link
@@ -80,7 +80,7 @@ function SideMenu() {
                     alt="user-icons" 
                     src={require("../assets/new_icons/image.png")} 
                   />
-                  <span className="text-sm font-medium"> Image Upload</span>
+                  <span className="text-sm font-medium"> Téléchargement d'images </span>
                 </Link>
 
               </nav>
@@ -113,7 +113,7 @@ function SideMenu() {
                     alt="inventory-icon"
                     src={require("../assets/new_icons/inventory.png")}
                   />
-                  <span className="text-sm font-medium"> Inventory </span>
+                  <span className="text-sm font-medium"> inventaire </span>
                 </Link>
 
                 <Link
@@ -125,7 +125,7 @@ function SideMenu() {
                     alt="purchase-icon"
                     src={require("../assets/new_icons/purchase.png")}
                   />
-                  <span className="text-sm font-medium"> Expense </span>
+                  <span className="text-sm font-medium"> dépenses </span>
                 </Link>
 
                 <Link
@@ -133,7 +133,7 @@ function SideMenu() {
                   className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
                 >
                   <img className="w-5" alt="sale-icon" src={require("../assets/new_icons/sales.png")} />
-                  <span className="text-sm font-medium"> Sales</span>
+                  <span className="text-sm font-medium"> ventes</span>
                 </Link>
 
                 <Link
@@ -145,7 +145,7 @@ function SideMenu() {
                     alt="user-icons" 
                     src={require("../assets/new_icons/image.png")} 
                   />
-                  <span className="text-sm font-medium"> Image Upload</span>
+                  <span className="text-sm font-medium"> Téléchargement d'images </span>
                 </Link>
 
             </nav>

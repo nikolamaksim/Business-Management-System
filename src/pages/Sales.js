@@ -163,7 +163,7 @@ function Sales() {
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
           <div className="flex justify-between pt-5 pb-3 px-3">
             <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Sales</span>
+              <span className="font-bold">ventes</span>
               <SearchByVIN />
             </div>
             <div className="flex gap-4">
@@ -171,7 +171,7 @@ function Sales() {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
                 onClick={addSaleModalSetting}
               >
-                Add Sales
+                ajouter ventes
               </button>
             </div>
           </div>
@@ -183,34 +183,34 @@ function Sales() {
               <thead>
                 <tr>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    VIN Number
+                    VIN nombre
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Date
+                    ventes date
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Payment Type
+                    type de paiement
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Price/$
+                    prix/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Amount/$
+                    ventes montante/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Balance/$
+                    ventes équilibre/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Approval State
+                    statut approuvé
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Name
+                    nom du client
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Phone Number
+                    numéro de téléphone du client
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Email
+                    email client
                   </th>
                 </tr>
               </thead>
@@ -344,34 +344,34 @@ function Sales() {
               <thead>
                 <tr>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    VIN Number
+                    VIN nombre
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Date
+                    ventes date
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Payment Type
+                    type de paiement
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Price/$
+                    prix/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Amount/$
+                    ventes montant/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Sales Balance/$
+                    ventes équilibre/$
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Approval State
+                    statut approuvé
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Name
+                    nom du client
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Phone Number
+                    téléphone du client
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    Customer Email
+                    email client
                   </th>
                 </tr>
               </thead>

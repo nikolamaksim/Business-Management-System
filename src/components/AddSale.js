@@ -129,7 +129,7 @@ export default function AddSale({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        Add Sale
+                        ajouter ventes
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -138,7 +138,7 @@ export default function AddSale({
                               htmlFor="vinNumber"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              VIN Number
+                              VIN nombre
                             </label>
                             <select
                               name="vinNumber"
@@ -149,7 +149,7 @@ export default function AddSale({
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                             >
-                              <option disabled selected>Select VIN Number</option>
+                              <option disabled selected>choisir VIN nombre</option>
                               {vinArray.map((element, id) => {
                                 return (
                                   <option key = {`${element}${id}`} value={element}>
@@ -164,7 +164,7 @@ export default function AddSale({
                               htmlFor="salesDate"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Sales Date
+                              ventes date
                             </label>
                             <input
                               type="date"
@@ -183,7 +183,7 @@ export default function AddSale({
                               htmlFor="paymentType"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Payment Type
+                              type de paiement
                             </label>
                             <select
                               id="paymentType"
@@ -193,7 +193,7 @@ export default function AddSale({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                             >
-                              <option disabled selected>Select Payment Type</option>
+                              <option disabled selected>choisir type de paiement</option>
                               <option>Partial Payment</option>
                               <option>Full Payment</option>
                             </select>
@@ -203,7 +203,7 @@ export default function AddSale({
                               htmlFor="price"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Price
+                              prix
                             </label>
                             <input
                               type="number"
@@ -221,7 +221,7 @@ export default function AddSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="income"
                             >
-                              Income
+                              revenu
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -239,7 +239,7 @@ export default function AddSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="customerName"
                             >
-                              Customer Full Name
+                              nom complet du client
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -257,7 +257,7 @@ export default function AddSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="phoneNumber"
                             >
-                              Customer Phone Number
+                              numéro de téléphone du client
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -275,7 +275,7 @@ export default function AddSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="email"
                             >
-                              Customer Email
+                              email client
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -301,7 +301,7 @@ export default function AddSale({
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={addSale}
                   >
-                    Add Sale
+                    ajouter ventes                    
                   </button>
                   <button
                     type="button"
@@ -309,7 +309,7 @@ export default function AddSale({
                     onClick={() => addSaleModalSetting()}
                     ref={cancelButtonRef}
                   >
-                    Cancel
+                    annuler
                   </button>
                 </div>
               </Dialog.Panel>

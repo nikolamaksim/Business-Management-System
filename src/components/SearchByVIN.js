@@ -31,7 +31,7 @@ export default function SearchByVIN() {
             className="border-none outline-none focus:border-none text-xs"
             type="text"
             id="searchInput"
-            placeholder="Search here by VIN"
+            placeholder="Rechercher ici par VIN"
             onChange={handleSearch}
             />
         </div>

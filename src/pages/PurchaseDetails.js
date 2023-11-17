@@ -141,7 +141,7 @@ function PurchaseDetails() {
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
           <div className="flex justify-between pt-5 pb-3 px-3">
             <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Purchase</span>
+              <span className="font-bold">dépenses</span>
               <SearchByVIN />
             </div>
             <div className="flex gap-4">
@@ -149,7 +149,7 @@ function PurchaseDetails() {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
                 onClick={addSaleModalSetting}
               >
-                Add Purchase
+                ajouter dépenses
               </button>
             </div>
           </div>
@@ -163,31 +163,31 @@ function PurchaseDetails() {
                     VIN
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Make
+                    fabricante
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Model
+                    modèle
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Year
+                    année
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Date
+                    date
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Condition
+                    emplacement
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Initial Exp/$
+                    initiales Exp/$
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Add Exp/$
+                    supplémentaire Exp/$
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Total/$
+                    totale/$
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Approval State
+                    statut approuvé
                   </th>
                 </tr>
               </thead>
@@ -215,7 +215,7 @@ function PurchaseDetails() {
                           : new Date(element.purchaseDate).toLocaleDateString()}
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
-                        {element.condition}
+                        {element.location}
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
                         {element.initial}
@@ -335,25 +335,25 @@ function PurchaseDetails() {
                     VIN
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Make
+                    fabricante
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Model
+                    modèle
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Year
+                    année
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Date
+                    date
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Condition
+                    emplacement
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Add Exp/$
+                    supplémentaire Exp/$
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Approval State
+                    statut approuvé
                   </th>
                 </tr>
               </thead>
@@ -381,7 +381,7 @@ function PurchaseDetails() {
                           : new Date(element.purchaseDate).toLocaleDateString()}
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
-                        {element.condition}
+                        {element.location}
                       </td>
                       <Popover>
                         <PopoverHandler>

@@ -105,7 +105,7 @@ export default function AddUser({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        Add New User
+                        ajouter nouvel utilisateur
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -114,7 +114,7 @@ export default function AddUser({
                               htmlFor="firstName"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              First Name
+                              prénom
                             </label>
                             <input
                                 type="text"
@@ -133,7 +133,7 @@ export default function AddUser({
                               htmlFor="lastName"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Last Name
+                              nom de famille
                             </label>
                             <input
                               type="text"
@@ -152,7 +152,7 @@ export default function AddUser({
                               htmlFor="phoneNumber"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Phone Number
+                              téléphone 
                             </label>
                             <input
                                 type="phone"
@@ -170,7 +170,7 @@ export default function AddUser({
                               htmlFor="email"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Email Address
+                              adresse e-mail
                             </label>
                             <input
                               type="email"
@@ -189,7 +189,7 @@ export default function AddUser({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="password"
                             >
-                              Password
+                              mot de passe
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -208,7 +208,7 @@ export default function AddUser({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="role"
                             >
-                              User Role
+                              rôle d'utilisateur
                             </label>
                             <select
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -218,7 +218,7 @@ export default function AddUser({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                             >
-                              <option disabled selected>Select User Role</option>
+                              <option disabled selected>choisir rôle d'utilisateur</option>
                               <option>super</option>
                               <option>normal</option>
                             </select>
@@ -237,7 +237,7 @@ export default function AddUser({
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={addUser}
                   >
-                    Add New User
+                    ajouter nouvel utilisateur
                   </button>
                   <button
                     type="button"
@@ -245,7 +245,7 @@ export default function AddUser({
                     onClick={() => addUserModalSetting()}
                     ref={cancelButtonRef}
                   >
-                    Cancel
+                    annuler
                   </button>
                 </div>
               </Dialog.Panel>

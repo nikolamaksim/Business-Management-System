@@ -16,7 +16,7 @@ export default function AddPurchaseDetails({
     model: "",
     year: "",
     purchaseDate: "",
-    condition: "",
+    location: "",
     initial: "",
     additional: [],
     mainImageName: '',
@@ -29,7 +29,7 @@ export default function AddPurchaseDetails({
 
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
-    if (key === 'manufacturer' || key === 'model') {
+    if (value && (key === 'manufacturer' || key === 'model')) {
       value = value[0].toUpperCase() + value.slice(1).toLowerCase();  
     }
     setPurchase({ ...purchase, [key]: value });
@@ -42,8 +42,8 @@ export default function AddPurchaseDetails({
         !purchase.model || 
         !purchase.year || 
         !purchase.purchaseDate || 
-        !purchase.condition || 
-        !purchase.condition || 
+        !purchase.location || 
+        !purchase.location || 
         !purchase.initial) {
           alert('Please fill out the form correctly.')
         } else {
@@ -112,7 +112,7 @@ export default function AddPurchaseDetails({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        Purchase Details
+                        détails des dépenses
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -121,7 +121,7 @@ export default function AddPurchaseDetails({
                               htmlFor="vin"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              VIN Number
+                              VIN nombre
                             </label>
                             <input
                               id="vin"
@@ -138,7 +138,7 @@ export default function AddPurchaseDetails({
                               htmlFor="manufacturer"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Make
+                              fabricante
                             </label>
                             <input
                               type="text"
@@ -157,7 +157,7 @@ export default function AddPurchaseDetails({
                               htmlFor="model"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              model
+                              modèle
                             </label>
                             <input
                               type="text"
@@ -176,7 +176,7 @@ export default function AddPurchaseDetails({
                               htmlFor="year"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Year
+                              année
                             </label>
                             <input
                               type="number"
@@ -195,7 +195,7 @@ export default function AddPurchaseDetails({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="purchaseDate"
                             >
-                              Purchase Date
+                              date des dépenses
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -210,29 +210,31 @@ export default function AddPurchaseDetails({
                           </div>
                           <div>
                             <label
-                              htmlFor="condition"
+                              htmlFor="location"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Condition
+                              emplacement
                             </label>
-                            <input
-                              type="text"
-                              name="condition"
-                              id="condition"
-                              value={purchase.condition}
+                            <select
+                              id="location"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              name="location"
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Condition of the Car"
-                            />
+                            >
+                              <option selected disabled>emplacement</option>
+                              <option>Cotonou</option>
+                              <option>Lome</option>
+                              <option>Niamey</option>
+                            </select>
                           </div>
                           <div>
                             <label
                               htmlFor="initial"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Initial Purchase Amount
+                              montant des dépenses initiales
                             </label>
                             <input
                               type="number"
@@ -257,7 +259,7 @@ export default function AddPurchaseDetails({
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={addSale}
                   >
-                    Add
+                    ajouter
                   </button>
                   <button
                     type="button"
@@ -265,7 +267,7 @@ export default function AddPurchaseDetails({
                     onClick={() => addSaleModalSetting()}
                     ref={cancelButtonRef}
                   >
-                    Cancel
+                    annuler
                   </button>
                 </div>
               </Dialog.Panel>

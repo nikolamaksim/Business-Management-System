@@ -5,7 +5,7 @@ function NoPageFound() {
   return (
     <div className="grid h-screen px-4 place-content-center">
       <div style={{position:"fixed", top:"5%", left:"10%"}} >
-        <Link to='/inventory' className="flex items-center gap-2 rounded-lg hover:bg-gray-100 px-4 py-2 text-gray-700 bg-slate-300">Back</Link>
+        <Link to='/inventory' className="flex items-center gap-2 rounded-lg hover:bg-gray-100 px-4 py-2 text-gray-700 bg-slate-300">arrière</Link>
       </div>
       <div className="text-center">
         <svg
@@ -28,10 +28,10 @@ function NoPageFound() {
         </svg>
 
         <h1 className="mt-6 text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Uh-oh! 404 Error
+          Oh-oh ! Erreur 404
         </h1>
 
-        <p className="mt-4 text-gray-500">We can't find that page.</p>
+        <p className="mt-4 text-gray-500">Nous ne trouvons pas cette page.</p>
       </div>
     </div>
   );

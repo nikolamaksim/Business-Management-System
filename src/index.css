@@ -19,7 +19,7 @@ code {
 }
 
 td {
-  /* min-width: 70px; */
+  min-width: 50px;
   /* max-width: 200px; Set the desired width for the <td> element */
   /* overflow: hidden;  */
   /* white-space: nowrap; Prevent line breaks within the cell */

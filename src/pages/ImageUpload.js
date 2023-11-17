@@ -43,7 +43,7 @@ function ImageUpload() {
                         mainImageName: e.target.files[0].name,
                     })
                     .then(() => {
-                        alert('Main Image Uploaded Successfully.')
+                        alert('Image principale téléchargée avec succès.')
                     })
                 } else {
                     docSnap.slideImageUrl.push(
@@ -53,13 +53,13 @@ function ImageUpload() {
                         slideImageUrl: docSnap.slideImageUrl,
                     })
                     .then(() => {
-                        alert('SlideShow Image Uploaded Successfully.')
+                        alert('Image du diaporama téléchargée avec succès.')
                     })
                 }
             });
-            console.log('sucess');
             handlePageUpdate();
         } catch (err) {
+            alert('Veuillez réessayer.')
             console.log(err);
         }
     }
@@ -107,7 +107,7 @@ function ImageUpload() {
             <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
               <div className="flex justify-between pt-5 pb-3 px-3">
                 <div className="flex gap-4 justify-center items-center ">
-                  <span className="font-bold">Search Images</span>
+                  <span className="font-bold">Rechercher des images</span>
                   <SearchByVIN />
                 </div>
               </div>
@@ -115,19 +115,19 @@ function ImageUpload() {
                 <thead>
                   <tr>
                     <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                      VIN
+                         VIN
                     </th>
                     <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                      Main Image
+                        Image principale
                     </th>
                     <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900" style={{minWidth: '350px'}}>
-                      Images for slideshow
+                        Images pour le diaporama
                     </th>
                     <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                      Upload Main Image
+                        Télécharger Image principale
                     </th>
                     <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                      Upload Slide Images
+                        Télécharger Images de diapositives
                     </th>
                   </tr>
                 </thead>
@@ -172,7 +172,7 @@ function ImageUpload() {
                             {
                                 element.mainImageName
                                 ?
-                                <>Only One is Allowed</>
+                                <>Un seul est autorisé</>
                                 :
                                 <div>
                                     <label
@@ -191,7 +191,7 @@ function ImageUpload() {
                                         />
                                         </svg>
                                         <span className="inline-block">
-                                            Upload Main Image
+                                        Télécharger l'image principale
                                         </span>
                                     </label>
                                     <input
@@ -222,8 +222,7 @@ function ImageUpload() {
                                     />
                                     </svg>
                                     <span className="inline-block">
-                                        Upload Slide Images
-                                    </span>
+                                    Télécharger des images de diapositives                                    </span>
                                 </label>
                                 <input
                                     type="file"

@@ -3,9 +3,7 @@ import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 
 import React, { useState, useEffect, useContext } from "react";
 import AuthContext from "../AuthContext";
-import SearchByVIN from "../components/SearchByVIN";
 import AddUser from "../components/AddUser";
-import ConfirmationModal from "../components/ConfirmationModal";
 
 function Users() {
 
@@ -15,8 +13,6 @@ function Users() {
   const [showUserModal, setUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [updatePage, setUpdatePage] = useState(true);
-
-  const [idForDeletion, setIdForDeletion] = useState('');
   
   const authContext = useContext(AuthContext);
 
@@ -36,20 +32,17 @@ function Users() {
   }
 
   // Delete Item
-  const deleteItem = async (id = idForDeletion) => {
+  const deleteItem = async (id) => {
     try {
-      const documentRef = doc(db, 'users', id);
-      await deleteDoc(documentRef);
-      handlePageUpdate();
-      confirmationModalSetting();
+      const confirm = window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')
+      if (confirm) {
+        const documentRef = doc(db, 'users', id);
+        await deleteDoc(documentRef);
+        handlePageUpdate();
+      }
     } catch (err) {
       console.log(err);
     }
-  }
-
-  // Confirmation Modal Setting
-  const confirmationModalSetting = () => {
-    setShowConfirmationModal(!showConfirmationModal)
   }
 
   // Modal for User Add
@@ -75,26 +68,18 @@ function Users() {
           />
         )}
 
-        {showConfirmationModal && (
-            <ConfirmationModal 
-                executeFunction={deleteItem}
-                confirmationModalSetting={confirmationModalSetting}
-            />
-        )}
-
         {/* Table  */}
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
           <div className="flex justify-between pt-5 pb-3 px-3">
             <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Purchase</span>
-              <SearchByVIN />
+              <span className="font-bold">utilisateurs</span>
             </div>
             <div className="flex gap-4">
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
                 onClick={addUserModalSetting}
               >
-                Add New User
+                ajouter nouvel utilisateur
               </button>
             </div>
           </div>
@@ -102,19 +87,19 @@ function Users() {
               <thead>
                 <tr>
                 <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Name
+                    nom
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Email
+                    email
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    phoneNumber
+                    téléphone 
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Password
+                    mot de passe
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    Super User?
+                    superutilisateur?
                   </th>
                 </tr>
               </thead>
@@ -146,11 +131,11 @@ function Users() {
                         {
                             element.email === 'peter95613@gmail.com'
                             ?
-                            <span>Default User</span>
+                            <span>utilisateur par defaut</span>
                             :
                             <span
                                 className="text-red-600 px-4 cursor-pointer"
-                                onClick={() => {setIdForDeletion(element._id); confirmationModalSetting()}}
+                                onClick={() => deleteItem(element._id)}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />

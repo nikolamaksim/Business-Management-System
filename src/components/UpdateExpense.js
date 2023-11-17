@@ -104,7 +104,7 @@ export default function UpdateExpense({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="date"
                             >
-                              Date
+                              date
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -122,7 +122,7 @@ export default function UpdateExpense({
                               htmlFor="amount"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Amount
+                              montant
                             </label>
                             <input
                               type="number"
@@ -142,7 +142,7 @@ export default function UpdateExpense({
                               htmlFor="reason"
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
-                              Reason
+                              explication
                             </label>
                             <textarea
                               name="reason"
@@ -165,7 +165,7 @@ export default function UpdateExpense({
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                     onClick={add}
                   >
-                    Add
+                    ajouter
                   </button>
                   <button
                     type="button"
@@ -173,7 +173,7 @@ export default function UpdateExpense({
                     onClick={() => updateExpenseModalSetting()}
                     ref={cancelButtonRef}
                   >
-                    Cancel
+                    annuler
                   </button>
                 </div>
               </Dialog.Panel>

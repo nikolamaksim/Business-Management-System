@@ -30,7 +30,7 @@ function Inventory() {
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
           <div className="flex justify-between pt-5 pb-3 px-3">
             <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Inventory</span>
+              <span className="font-bold">inventaire</span>
               <SearchByVIN />
             </div>
           </div>
@@ -41,19 +41,19 @@ function Inventory() {
                   VIN
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Make
+                  fabricante
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Model
+                  modèle
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Year
+                  année
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Condition
+                  emplacement
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Availability
+                  disponibilité
                 </th>
               </tr>
             </thead>
@@ -75,7 +75,7 @@ function Inventory() {
                       {element.year}
                     </td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.condition}
+                      {element.location}
                     </td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                       {element.state}
