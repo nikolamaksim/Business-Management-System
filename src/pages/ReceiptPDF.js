@@ -65,7 +65,7 @@ const ReceiptPDF = ({ sales }) => (
     <Page size="A4" style={styles.page}>
       <View style={{...styles.header, backgroundColor:'gray'}}>
         <Text style={{...styles.title, color: 'white'}}>RAZ AUTO SALE</Text>
-        <Text style={{...styles.contact, color: 'white'}}>Contactez-nous: razackissa@gmail.com | +229 62 31 34 95</Text>
+        <Text style={{...styles.contact, color: 'white'}}>Contactez-nous: info@razautosale.com | +229 62 31 34 95</Text>
       </View>
       <View style={styles.header}>
         <Text style={{...styles.sectionContent, textAlign: 'left'}}>Vous avez acheté votre voiture de</Text>

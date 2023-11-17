@@ -25,6 +25,9 @@ export default function UpdatePurchaseDetail({
 
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
+    if (key === 'manufacturer' || key === 'model') {
+      value = value[0].toUpperCase() + value.slice(1).toLowerCase();  
+    }
     setPurchase({ ...purchase, [key]: value });
   };
 

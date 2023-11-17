@@ -87,48 +87,50 @@ function Sales() {
   // Send Receipt
   const sendReceipt = async (element) => {
     try {
-
-      // Configure EmailJS with your credentials
-      await emailjs.init('BGnkmVYSCeuwRTU6g'); 
-  
-      const serviceId = 'service_2k35nxg';
-      const templateId = 'template_zvmgj4s';
-      const userId = 'BGnkmVYSCeuwRTU6g';
-  
-      const emailParams = {
-        to_email: element.email,
-        from_name: 'RAZ AUTO SALE',
-        vin: element.vin,
-        manufacturer: element.manufacturer,
-        model: element.model,
-        year: element.year,
-        customerName: element.customerName,
-        paymentType: element.paymentType,
-        price: element.price,
-        salesDate: element.salesDate[0],
-        lastSalesDate: element.salesDate[element.salesDate.length - 1],
-        lastPay: element.income[element.income.length - 1],
-        totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
-        balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
-        date: new Date().toLocaleDateString(),
-      };
-  
-      emailjs.send(serviceId, templateId, emailParams, userId).then(
-        (response) => {
-          alert('Email sent successfully:', response.text);
-  
-          updateDoc(doc(db, 'sales', element._id), {
-            receipt: true,
-          }).then(() => {
-            handlePageUpdate();
+      const confirm = window.confirm('Are you sure?');
+      if (confirm == true) {      // Configure EmailJS with your credentials
+        await emailjs.init('BGnkmVYSCeuwRTU6g'); 
+    
+        const serviceId = 'service_2k35nxg';
+        const templateId = 'template_zvmgj4s';
+        const userId = 'BGnkmVYSCeuwRTU6g';
+    
+        const emailParams = {
+          to_email: element.email,
+          from_name: 'RAZ AUTO SALE',
+          vin: element.vin,
+          manufacturer: element.manufacturer,
+          model: element.model,
+          year: element.year,
+          customerName: element.customerName,
+          paymentType: element.paymentType,
+          price: element.price,
+          salesDate: element.salesDate[0],
+          lastSalesDate: element.salesDate[element.salesDate.length - 1],
+          lastPay: element.income[element.income.length - 1],
+          totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
+          balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
+          date: new Date().toLocaleDateString(),
+        };
+    
+        emailjs.send(serviceId, templateId, emailParams, userId).then(
+          (response) => {
+            alert('Email sent successfully:', response.text);
+    
+            updateDoc(doc(db, 'sales', element._id), {
+              receipt: true,
+            }).then(() => {
+              handlePageUpdate();
+            }
+            );
+          },
+          (error) => {
+            console.error('Failed to send email:', error);
           }
-          );
-        },
-        (error) => {
-          console.error('Failed to send email:', error);
-        }
-      );
-    } catch (err) {
+        );
+      } 
+
+      } catch (err) {
       console.log(err);
     }
 

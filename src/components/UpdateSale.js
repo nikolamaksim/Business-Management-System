@@ -24,7 +24,6 @@ export default function UpdateSale({
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
-
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
     setSale({ ...sale, [key]: value });
@@ -37,10 +36,14 @@ export default function UpdateSale({
             const docSnap = await getDoc(docRef);
             let salesData = docSnap.data();
             if (sale.salesDate && sale.income) {
-              salesData.salesDate.push(sale.salesDate);
-              salesData.income.push(sale.income);
-              salesData.state.push('not approved');
-              salesData.receipt = false;
+              if (sale.income > sale.price - salesData.income.reduce((sum, a) => sum += a, 0)) {
+                window.alert('Veuillez confirmer à nouveau le montant de vos ventes.')
+              } else {
+                salesData.salesDate.push(sale.salesDate);
+                salesData.income.push(sale.income);
+                salesData.state.push('not approved');
+                salesData.receipt = false;
+              }
             }
             salesData.paymentType = sale.paymentType;
             salesData.price = sale.price;
