@@ -43,11 +43,13 @@ function Dashboard() {
 
   // Filter the Sales Data
   useEffect(() => {
+    let salesFiltered = [];
+    let revenueFiltered = [];
+    let revenue = 0;
     if (salesDateRange.from && salesDateRange.to) {
-      let salesFiltered = sales.filter((sale) => (sale.salesDate[0] >= salesDateRange.from) && (sale.salesDate[0] <= salesDateRange.to));
+      salesFiltered = sales.filter((sale) => (sale.salesDate[0] >= salesDateRange.from) && (sale.salesDate[0] <= salesDateRange.to));
       setSalesFiltered(salesFiltered);
 
-      let revenueFiltered = [];
       for (let i in sales) {
         for (let j in sales[i].salesDate) {
           if (sales[i].salesDate[j] >= salesDateRange.from && sales[i].salesDate[j] <= salesDateRange.to) {
@@ -57,8 +59,7 @@ function Dashboard() {
         }
       };
       setRevenueFiltered(revenueFiltered);
-      
-      let revenue = 0;
+
       for (let i in revenueFiltered) {
         for (let j in revenueFiltered[i].salesDate) {
           if (revenueFiltered[i].salesDate[j] >= salesDateRange.from && revenueFiltered[i].salesDate[j] <= salesDateRange.to) {
@@ -67,17 +68,22 @@ function Dashboard() {
         }
       }
       setRevenue(revenue);
+    } else {
+      setSalesFiltered([]);
+      setRevenueFiltered([]);
+      setRevenue(0);
     }
   }, [salesDateRange]);
 
   // Filter the Expense Data
   useEffect(()=> {
+    let productsFiltered = [];
+    let expenseFiltered = [];
+    let expense = 0;
     if (expenseDateRange.from && expenseDateRange.to) {
-      let expense = 0;
-      let productsFiltered = productsTotal.filter((product) => (product.purchaseDate >= expenseDateRange.from && product.purchaseDate <= expenseDateRange.to));
+      productsFiltered = productsTotal.filter((product) => (product.purchaseDate >= expenseDateRange.from && product.purchaseDate <= expenseDateRange.to));
       setProductsFiltered(productsFiltered);
 
-      let expenseFiltered = [];
       for (let i in productsTotal) {
         for (let j in productsTotal[i].additional) {
           if (productsTotal[i].additional[j].date >= expenseDateRange.from && productsTotal[i].additional[j].date <= expenseDateRange.to) {
@@ -97,6 +103,10 @@ function Dashboard() {
         }
       }
       setExpense(expense);
+    } else {
+      setProductsFiltered([]);
+      setExpenseFiltered([]);
+      setExpense(0);
     }
   }, [expenseDateRange]) 
 
@@ -469,6 +479,7 @@ function Dashboard() {
       </div>
       {/* Sales Overview */}
       <div className="grid grid-cols-1 col-span-12 lg:col-span-10 gap-6 lg:grid-cols-2  p-4 ">
+        {/* chart */}
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
 
           <div>
@@ -497,6 +508,7 @@ function Dashboard() {
           />
           </div>
         </div>
+        {/* table */}
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
             <span>
@@ -505,8 +517,19 @@ function Dashboard() {
                 ${revenue}
               </span>
             </span>
+            <span 
+              className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded" 
+              style={{float: 'right'}}
+              onClick={() => setSalesDateRange({
+                from: '',
+                to: ''
+              })}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </span>
             </div>
-
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
               <label
@@ -709,6 +732,18 @@ function Dashboard() {
               <span className="ml-5 text-2xl">
                 ${expense}
               </span>
+            </span>
+            <span 
+              className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded" 
+              style={{float: 'right'}}
+              onClick={() => setExpenseDateRange({
+                from: '',
+                to: ''
+              })}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
             </span>
             </div>
 
