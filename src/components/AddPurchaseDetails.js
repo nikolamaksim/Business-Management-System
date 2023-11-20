@@ -225,7 +225,7 @@ export default function AddPurchaseDetails({
                             >
                               <option selected disabled>emplacement</option>
                               <option>Cotonou, Benin</option>
-                              <option>Lomé, Togo</option>
+                              <option>Lome, Togo</option>
                               <option>Niamey, Niger</option>
                             </select>
                           </div>

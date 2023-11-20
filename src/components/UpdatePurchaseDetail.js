@@ -210,9 +210,9 @@ export default function UpdatePurchaseDetail({
                               }
                             >
                               <option selected disabled>emplacement</option>
-                              <option>Cotonou</option>
-                              <option>Lome</option>
-                              <option>Niamey</option>
+                              <option>Cotonou, Benin</option>
+                              <option>Lome, Togo</option>
+                              <option>Niamey, Niger</option>
                             </select>
                           </div>
                           <div>

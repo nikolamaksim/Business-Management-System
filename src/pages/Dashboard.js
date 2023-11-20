@@ -536,7 +536,7 @@ function Dashboard() {
                 htmlFor="salesDateFrom"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                depuis
+                de
               </label>
               <input
                 type="date"
@@ -753,7 +753,7 @@ function Dashboard() {
                 htmlFor="expenseDateFrom"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                depuis
+                de
               </label>
               <input
                 type="date"
