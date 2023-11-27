@@ -1,4 +1,5 @@
-import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '../config/firebase.config';
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -50,6 +51,11 @@ export default function AddUser({
             role: user.role,
             timestamp: serverTimestamp(),
           });
+          await setDoc(doc(db, 'finances', user.email, ), {
+            userName: user.firstName + ' ' + user.lastName,
+            finances: {}
+          });
+          await 
           addUserModalSetting();
           handlePageUpdate();
         } catch (err) {

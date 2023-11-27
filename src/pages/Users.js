@@ -1,5 +1,5 @@
 import { db } from "../config/firebase.config";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 
 import React, { useState, useEffect, useContext } from "react";
 import AuthContext from "../AuthContext";
@@ -12,6 +12,11 @@ function Users() {
   const [showUserModal, setUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [updatePage, setUpdatePage] = useState(true);
+
+  const [expense, setExpense] = useState([]);
+  const [username, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  
   
   const authContext = useContext(AuthContext);
 
@@ -30,6 +35,17 @@ function Users() {
     }
   }
 
+  // Fetch Expense Data for a certain user
+  const fetchExpenseData = async (useremail) => {
+    try {
+      const ExpenseData = await getDocs(collection(db, 'finances', useremail, 'finances'));
+      let expense = ExpenseData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
+      setExpense(expense);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   // Delete Item
   const deleteItem = async (id) => {
     try {
@@ -39,6 +55,26 @@ function Users() {
         await deleteDoc(documentRef);
         handlePageUpdate();
       }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // Approve Expense
+  const approveItem = async (userEmail, id) => {
+    try {
+      const docRef = doc(db, 'finances', userEmail, 'finances', id);
+      const docData = (await getDoc(docRef)).data();
+      if (docData.state === 'approved') {
+        await updateDoc(docRef, {
+          state: 'not approved'
+        });
+      } else {
+        await updateDoc(docRef, {
+          state: 'approved'
+        });
+      };
+      handlePageUpdate();
     } catch (err) {
       console.log(err);
     }
@@ -108,7 +144,14 @@ function Users() {
                   return (
                     <tr key={element._id} className={element.state === 'on sale' ? 'bg-green-100' : element.state === 'sold' ? 'bg-slate-200' : 'bg-white'}>
                       <td className="whitespace-nowrap px-2 py-2  text-gray-900">
-                        {element.firstName} {element.lastName}
+                        <span className="cursor-pointer" 
+                          onClick={() => {
+                            setUserName(element.firstName + ' ' + element.lastName)
+                            setUserEmail(element.email);
+                            fetchExpenseData(element.email);
+                            }}>
+                          {element.firstName} {element.lastName}
+                        </span>
                       </td>
                       <td className="whitespace-nowrap px-2 py-2 text-gray-700">
                         {element.email}
@@ -126,7 +169,7 @@ function Users() {
                         :
                         'No'}
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-gray-700">
+                      <td className="whitespace-nowrap px-2 text-gray-700">
                         {
                             element.email === 'peter95613@gmail.com'
                             ?
@@ -148,8 +191,73 @@ function Users() {
               </tbody>
             </table>
         </div>
+
+        {/* employee finances */}
+        <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 mb-10">
+          <div className="flex justify-between pt-5 pb-3 px-3">
+            <div className="flex gap-4 justify-center items-center ">
+              <span className="font-bold">{username}</span>
+            </div>
+          </div>
+
+          <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
+            <thead>
+              <tr>  
+                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
+                  date
+                </th>  
+                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
+                  genre
+                </th>  
+                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
+                  montante
+                </th>  
+                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
+                  explication
+                </th>  
+                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
+                  statut
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                expense.map((element, index) => {
+                  return (
+                    <tr key={element._id}>
+                    <td className="whitespace-nowrap px-2 py-2 text-gray-900">
+                      {element.date}
+                    </td>
+                    <td className="whitespace-nowrap px-2 py-2 text-gray-900">
+                      {element.type}
+                    </td>
+                      <td className="whitespace-nowrap px-2 py-2 text-gray-900">
+                        {element.amount}
+                      </td>
+                      <td className="whitespace-nowrap px-2 py-2 text-gray-900">
+                        {element.reason}
+                      </td>
+                      <td style={{minWidth:'100px'}}>
+                          <button
+                            className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded"
+                            onClick={() => {
+                              approveItem(userEmail, element._id)
+                              fetchExpenseData(userEmail)
+                            }}
+                          >
+                            {element.state}
+                          </button>
+                      </td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
+    
   );
 }
 

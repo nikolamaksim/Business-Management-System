@@ -115,7 +115,7 @@ export default function UpdatePurchaseDetail({
                               value={purchase.vin}
                               placeholder="Input VIN Number"
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                             />
                           </div>
@@ -132,7 +132,7 @@ export default function UpdatePurchaseDetail({
                               id="manufacturer"
                               value={purchase.manufacturer}
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               placeholder="Input Manufacturer"
@@ -151,7 +151,7 @@ export default function UpdatePurchaseDetail({
                               id="model"
                               value={purchase.model}
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               placeholder="Input Model"
@@ -170,7 +170,7 @@ export default function UpdatePurchaseDetail({
                               id="price"
                               value={purchase.year}
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               placeholder="Year"
@@ -190,7 +190,7 @@ export default function UpdatePurchaseDetail({
                               name="purchaseDate"
                               value={purchase.purchaseDate}
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                             />
                           </div>
@@ -206,7 +206,7 @@ export default function UpdatePurchaseDetail({
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               name="location"
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                             >
                               <option selected disabled>emplacement</option>
@@ -228,7 +228,7 @@ export default function UpdatePurchaseDetail({
                               id="initial"
                               value={purchase.initial}
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                               placeholder="Initial Amount"

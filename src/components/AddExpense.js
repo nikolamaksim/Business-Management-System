@@ -1,18 +1,20 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../config/firebase.config";
 
-export default function UpdateExpense({
+export default function AddExpense({
   collectionRef,
-  updatePurchaseData,
-  updateExpenseModalSetting,
+  addExpenseModalSetting,
   handlePageUpdate,
 }) {
-  const [purchase, setPurchase] = useState({
+  const [expense, setExpense] = useState({
     date: '',
+    type: '',
     amount: '',
     reason: '',
+    state: 'not approved'
   });
 
   const [open, setOpen] = useState(true);
@@ -20,33 +22,28 @@ export default function UpdateExpense({
 
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
-    setPurchase({ ...purchase, [key]: value });
+    setExpense({ ...expense, [key]: value });
   };
 
   // POST Data
   const add = async () => {
-    if (purchase.date !== '' && purchase.amount !== '' && purchase.reason !== '') {
+    if (expense.date !== '' && expense.type !== '' && expense.amount !== '' && expense.reason !== '') {
       try {
-        const docRef = doc(collectionRef, updatePurchaseData._id);
-        let docSnap = await getDoc(docRef);
-        let additional = docSnap.data().additional;
-        additional.push({
-          date: purchase.date,
-          amount: purchase.amount,
-          reason: purchase.reason,
-          state: 'not approved'
+        await addDoc(collectionRef, {
+          date: expense.date,
+          type: expense.type,
+          amount: expense.amount,
+          reason: expense.reason,
+          state: expense.state
         })
-        await updateDoc(docRef, {
-          additional: additional,
-        });
-        updateExpenseModalSetting();
+        addExpenseModalSetting();
         handlePageUpdate();
       } catch (err) {
         console.log(err);
       }
     } else {
       alert('Veuillez remplir correctement le formulaire.');
-    }      
+    }
   };
 
   return (
@@ -95,7 +92,7 @@ export default function UpdateExpense({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        VIN: {purchase.vin}
+                        ajouter
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -111,7 +108,7 @@ export default function UpdateExpense({
                               type="date"
                               id="date"
                               name="date"
-                              value={purchase.date}
+                              value={expense.date}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
@@ -128,7 +125,7 @@ export default function UpdateExpense({
                               type="number"
                               name="amount"
                               id="amount"
-                              value={purchase.amount}
+                              value={expense.amount}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
@@ -138,23 +135,44 @@ export default function UpdateExpense({
                           </div>
                         </div>
                         <div>
-                            <label
-                              htmlFor="reason"
-                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                            >
-                              explication
-                            </label>
-                            <textarea
-                              name="reason"
-                              id="reason"
-                              value={purchase.reason}
+                          <label
+                            htmlFor="type"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            genre
+                          </label>
+                            <select
+                              id="type"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              name="type"
                               onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
+                                handleInputChange(e.target.name, e.target.value.trim())
                               }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder="Input the Use of This Expense"
-                            />
-                          </div>
+                            >
+                              <option disabled>Sélectionnez le type de financement</option>
+                              <option>sale</option>
+                              <option>expense</option>
+                              <option>imbersement</option>
+                            </select>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="reason"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            explication
+                          </label>
+                          <textarea
+                            name="reason"
+                            id="reason"
+                            value={expense.reason}
+                            onChange={(e) =>
+                              handleInputChange(e.target.name, e.target.value)
+                            }
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Input the Use of This Expense"
+                          />
+                        </div>
                       </form>
                     </div>
                   </div>
@@ -170,7 +188,7 @@ export default function UpdateExpense({
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={() => updateExpenseModalSetting()}
+                    onClick={() => addExpenseModalSetting()}
                     ref={cancelButtonRef}
                   >
                     annuler

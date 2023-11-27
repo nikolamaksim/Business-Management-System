@@ -8,7 +8,7 @@ function SideMenu() {
     <>
       {JSON.parse(localStorage.getItem('user')).role === 'super'
           ?
-          <div className="h-full flex-col justify-between bg-white hidden lg:flex ">
+          <div className="w-full h-full flex-col justify-between bg-white hidden lg:flex ">
             <div className="px-4 py-6">
               <nav aria-label="Main Nav" className="mt-6 flex flex-col space-y-1">
                 <Link
@@ -146,6 +146,18 @@ function SideMenu() {
                     src={require("../assets/new_icons/image.png")} 
                   />
                   <span className="text-sm font-medium"> Téléchargement d'images </span>
+                </Link>
+
+                <Link
+                  to="/finance"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 focus:ring hover:text-gray-700"
+                >
+                  <img 
+                    className="w-5"
+                    alt="user-icons" 
+                    src={require("../assets/new_icons/image.png")} 
+                  />
+                  <span className="text-sm font-medium"> finances </span>
                 </Link>
 
             </nav>

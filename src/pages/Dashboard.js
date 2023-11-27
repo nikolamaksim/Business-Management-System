@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, query, getDocs, where, documentId } from "firebase/firestore";
 import { db } from "../config/firebase.config";
 import { Popover, PopoverContent, PopoverHandler } from "@material-tailwind/react";
 
@@ -10,19 +10,21 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
 
+  const [users, setUsers] = useState([]);
   const [saleAmount, setSaleAmount] = useState([]);
   const [purchaseAmount, setPurchaseAmount] = useState([]);
-  const [sales, setSales] = useState([]);
   const [products, setProducts] = useState([]);
+  const [financeData, setFinanceData] = useState({});
   const [productsTotal, setProductsTotal] = useState([]);
   const [salesstate, setSalesState] = useState({
     good: 0,
     normal: 0,
     bad: 0
   });
+  // const [finances, setFinances] = useState({});
 
   // Variables for Filtering
-  const [salesDateRange, setSalesDateRange] = useState({
+  const [financeDateRange, setFinanceDateRange] = useState({
     from: '',
     to: ''
   });
@@ -32,83 +34,40 @@ function Dashboard() {
     to: ''
   });
 
-  const [salesFiltered, setSalesFiltered] = useState([]);
+  const [financeFiltered, setFinanceFiltered] = useState({})
+
   const [productsFiltered, setProductsFiltered] = useState([]);
-
-  const [revenueFiltered, setRevenueFiltered] = useState([]);
-  const [expenseFiltered, setExpenseFiltered] = useState([]);
-
-  const [revenue, setRevenue] = useState(0);
   const [expense, setExpense] = useState(0);
-
-  // Filter the Sales Data
-  useEffect(() => {
-    let salesFiltered = [];
-    let revenueFiltered = [];
-    let revenue = 0;
-    if (salesDateRange.from && salesDateRange.to) {
-      salesFiltered = sales.filter((sale) => (sale.salesDate[0] >= salesDateRange.from) && (sale.salesDate[0] <= salesDateRange.to));
-      setSalesFiltered(salesFiltered);
-
-      for (let i in sales) {
-        for (let j in sales[i].salesDate) {
-          if (sales[i].salesDate[j] >= salesDateRange.from && sales[i].salesDate[j] <= salesDateRange.to) {
-            revenueFiltered.push(sales[i]);
-            break
-          }
-        }
-      };
-      setRevenueFiltered(revenueFiltered);
-
-      for (let i in revenueFiltered) {
-        for (let j in revenueFiltered[i].salesDate) {
-          if (revenueFiltered[i].salesDate[j] >= salesDateRange.from && revenueFiltered[i].salesDate[j] <= salesDateRange.to) {
-            revenue += parseInt(revenueFiltered[i].income[j]);
-          }
-        }
-      }
-      setRevenue(revenue);
-    } else {
-      setSalesFiltered([]);
-      setRevenueFiltered([]);
-      setRevenue(0);
-    }
-  }, [salesDateRange]);
 
   // Filter the Expense Data
   useEffect(()=> {
     let productsFiltered = [];
-    let expenseFiltered = [];
     let expense = 0;
     if (expenseDateRange.from && expenseDateRange.to) {
       productsFiltered = productsTotal.filter((product) => (product.purchaseDate >= expenseDateRange.from && product.purchaseDate <= expenseDateRange.to));
       setProductsFiltered(productsFiltered);
 
-      for (let i in productsTotal) {
-        for (let j in productsTotal[i].additional) {
-          if (productsTotal[i].additional[j].date >= expenseDateRange.from && productsTotal[i].additional[j].date <= expenseDateRange.to) {
-            expenseFiltered.push(productsTotal[i])
-            break
-          }
-        }
-      }
-      setExpenseFiltered(expenseFiltered);
-
       expense += productsFiltered.reduce((sum, a) => sum += parseInt(a.initial), 0);
-      for (let i in expenseFiltered) {
-        for (let j in expenseFiltered[i].additional) {
-          if (expenseFiltered[i].additional[j].date >= expenseDateRange.from && expenseFiltered[i].additional[j].date <= expenseDateRange.to) {
-            expense += parseInt(expenseFiltered[i].additional[j].amount);
-          }
-        }
-      }
       setExpense(expense);
     } else {
       setProductsFiltered([]);
-      setExpenseFiltered([]);
       setExpense(0);
     }
-  }, [expenseDateRange]) 
+  }, [expenseDateRange])
+
+  // Filter the Finance Data
+  useEffect(() => {
+    let financeFiltered = {};
+    if (financeDateRange.from && financeDateRange.to) {
+      financeFiltered = Object.keys(financeData).map((key) => {
+        return financeData[key].filter((item) => (
+          item.date >= financeDateRange.from &&
+          item.date <= financeDateRange.to
+        ))
+      })
+    }
+    setFinanceFiltered(financeFiltered);
+  }, [financeDateRange])
 
   const [manufacturerdata, setManufacturerdata] = useState({});
   const [manufacturerdataTotal, setManufacturerdataTotal] = useState({});
@@ -116,11 +75,11 @@ function Dashboard() {
   const [doughnutBackground, setDoughnutBackground] = useState([]);
   const [doughnutBackgroundTotal, setDoughnutBackgroundTotal] = useState([]);
   const [doughnutBackgroundSold, setDoughnutBackgroundSold] = useState([]);
-  const [monthlySalesData, setMonthlySalesData] = useState({});
   const [monthlyExpenseData, setMonthlyExpenseData] = useState({});
+  const [monthlyFinanceData, setMonthlyFinanceData] = useState({});
 
   // data for bar plot
-  const [chart, setChart] = useState({
+  const [chartFinance, setChartFinance] = useState({
     options: {
       chart: {
         id: "monthly-sales",
@@ -215,13 +174,21 @@ function Dashboard() {
   };
 
   // Update Chart Data
-  const updateChartData = (salesData) => {
-    setChart({
-      ...chart,
+  const updateChartDataFinance = (salesData) => {
+    setChartFinance({
+      ...chartFinance,
       series: [
         {
-          name: "Montant des ventes mensuelles",
-          data: [...salesData],
+          name: "sales",
+          data: [...salesData[0]],
+        },
+        {
+          name: "expenses",
+          data: [...salesData[1]],
+        },
+        {
+          name: "imbersement",
+          data: [...salesData[2]],
         },
       ],
     });
@@ -243,7 +210,7 @@ function Dashboard() {
     fetchTotalSaleAmount();
     fetchTotalPurchaseAmount();
     fetchProductsData();
-    fetchMonthlySalesData();
+    fetchFinance();
     fetchMonthlyExpenseData();
   }, []);
 
@@ -273,7 +240,6 @@ function Dashboard() {
     try {
       const docSnap = await getDocs(collection(db, 'sales'));
       const salesData = await docSnap.docs.map((doc) => (doc.data()));
-      setSales(salesData);
       salesData.forEach((sale)=>{
         totalSaleAmount += sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0);
         sale.price <= sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0) 
@@ -302,7 +268,7 @@ function Dashboard() {
     let totalPurchaseAmount = 0;
     const docSnap = await getDocs(collection(db, 'products'));
     docSnap.forEach((purchase) => {
-      totalPurchaseAmount += (parseInt(purchase.data().initial) + purchase.data().additional.reduce((sum, a) => sum + parseInt(a.amount), 0));
+      totalPurchaseAmount += parseInt(purchase.data().initial);
     });
     setPurchaseAmount(totalPurchaseAmount);
   }
@@ -341,28 +307,62 @@ function Dashboard() {
     setManufacturerdataSold(manufacturerdataSold);
   }
 
-  // Fetch Monthly Sales
-  const fetchMonthlySalesData = async () => {
-    // Initialize the sales amount
-    let salesAmount = {
-      '2023': Array(12).fill(0), 
-      '2024': Array(12).fill(0), 
-      '2025': Array(12).fill(0),
-    }
-    try {
-      const docSnap = await getDocs(collection(db, 'sales'));
-      docSnap.forEach((sale) => {
-        sale.data().salesDate.forEach((date, i) => {
-          const year = date.split('-')[0];
-          const monthIndex = parseInt(date.split('-')[1]) - 1;
-          salesAmount[year][monthIndex] += parseInt(sale.data().income[i]);
-        });
+  // Fetch Finance Data
+  const fetchFinance = async () => {
+    // get userdata
+    const docSnap_user = await getDocs(query(collection(db, 'users'), where('role', '==', 'normal')));
+    const users = docSnap_user.docs.map((doc) => {return doc.data().email});
+
+    setUsers(users);
+
+    // Retrieve Finance Data
+    const finances = {};
+    for (const user of users) {
+      const docSnaps = await getDocs(collection(db, 'finances', user, 'finances'));
+      finances[user] = docSnaps.docs.map((doc) => {
+        return doc.data();
       });
-      setMonthlySalesData(salesAmount);
-      updateChartData(salesAmount['2023']);
-    } catch (err) {
-      console.log(err);
     }
+    
+    setFinanceData(finances);
+
+    // Construct Monthly Finance Data
+    // 0: sale, 1: expense, 2: reimbursement
+    let financeAmount = Array(3).fill().map(() => ({
+      '2023': Array(12).fill(0),
+      '2024': Array(12).fill(0),
+      '2025': Array(12).fill(0),
+    }));
+
+    Object.keys(finances).forEach((key) => {
+      finances[key].forEach((data) => {
+        let amount = data.amount;
+        const year = data.date.split('-')[0];
+        const month = parseInt(data.date.split('-')[1]) - 1;
+        if (data.type === 'sale') {
+          financeAmount[0][year][month] += parseInt(amount);
+        } else if (data.type === 'expense') {
+          financeAmount[1][year][month] += parseInt(amount);
+        } else {
+          financeAmount[2][year][month] += parseInt(amount);
+        }
+      });
+    });
+
+    // Set Data for Chart Drawing
+    let chartdata = {
+      '2023': [],
+      '2024': [],
+      '2025': []
+    }
+    Object.keys(chartdata).map((year) => {
+      financeAmount.map((data) => {
+        // console.log(data)
+        chartdata[year].push(data[year]);
+      })
+    })
+    updateChartDataFinance(chartdata['2023']);
+    setMonthlyFinanceData(chartdata);
   }
 
   // Fetch Monthly Expenses
@@ -381,12 +381,7 @@ function Dashboard() {
         products.push(data);
       });
       products.forEach((product) => {
-        let expense
-        if (product.additional[0]) {
-          expense = parseInt(product.initial) + product.additional.reduce((sum, a) => sum += parseInt(a.amount), 0);
-        } else {
-          expense = product.initial;
-        }
+        let expense = product.initial;
         const year = product.purchaseDate.split('-')[0];
         const monthIndex = parseInt(product.purchaseDate.split('-')[1]) - 1;
         expenseAmount[year][monthIndex] += parseInt(expense);
@@ -485,15 +480,15 @@ function Dashboard() {
           <div>
             <div className="mb-3 text-l">
             <span>
-              Ventes de cette année:
+              aperçu des finances
               <span className="ml-5 text-2xl">
-                ${chart.series[0].data.reduce((sum, a) => sum + a, 0)}
+                {/* ${chart.series[0].data.reduce((sum, a) => sum + a, 0)} */}
               </span>
             </span>
             </div>
             <div>
               <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-               onChange={(e) => updateChartData(monthlySalesData[e.target.value])}>
+               onChange={(e) => updateChartDataFinance(monthlyFinanceData[e.target.value])}>
                 <option>2023</option>
                 <option>2024</option>
                 <option>2025</option>
@@ -502,8 +497,8 @@ function Dashboard() {
           </div>
           <div>
           <Chart
-            options={chart.options}
-            series={chart.series}
+            options={chartFinance.options}
+            series={chartFinance.series}
             type="bar"
           />
           </div>
@@ -512,15 +507,15 @@ function Dashboard() {
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
             <span>
-              aperçu des ventes
+              Employee Finances
               <span className="ml-5 text-2xl">
-                ${revenue}
+                {/* ${revenue} */}
               </span>
             </span>
             <span 
               className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded" 
               style={{float: 'right'}}
-              onClick={() => setSalesDateRange({
+              onClick={() => setFinanceDateRange({
                 from: '',
                 to: ''
               })}
@@ -542,9 +537,9 @@ function Dashboard() {
                 type="date"
                 name="salesDateFrom"
                 id="salesDateFrom"
-                value={salesDateRange.from}
+                value={financeDateRange.from}
                 onChange={(e) =>
-                  setSalesDateRange({...salesDateRange, from: e.target.value})
+                  setFinanceDateRange({...financeDateRange, from: e.target.value})
                 }
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
               />
@@ -561,9 +556,9 @@ function Dashboard() {
                 type="date"
                 name="salesDateTo"
                 id="salesDateTo"
-                value={salesDateRange.to}
+                value={financeDateRange.to}
                 onChange={(e) =>
-                  setSalesDateRange({...salesDateRange, to: e.target.value})
+                  setFinanceDateRange({...financeDateRange, to: e.target.value})
                 }
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
               />
@@ -578,117 +573,92 @@ function Dashboard() {
             <thead>
               <tr>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  VIN nombre
+                  user
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  ventes date
+                  sales/$
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  type de paiement
+                  expenses/$
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  prix/$
+                  imbersement/$
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  balance/$
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {salesFiltered.map((sale) => {
+              {Object.keys(financeFiltered).map((user) => {
                 return (
-                  <tr key={`${sale.vin}-sale`}>
+                  <tr key={user}>
                     <Popover>
                       <PopoverHandler>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{sale.vin}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{users[user]}</td>
                       </PopoverHandler>
                       <PopoverContent>
-                        <div className="grid grid-cols-5">
-                          <div className="grid col-span-2">
-                            <p>ventes montante/$</p>
-                            <p>ventes équilibre/$</p>
-                            <p>nom du client</p>
-                            <p>numéro de téléphone du client</p>
-                            <p>email client</p>
-                          </div>
-                          <div className="grid col-span-1">
-                          </div>
-                          <div className="grid col-span-2">
-                            <p>{sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
-                            <p>{sale.price - sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
-                            <p>{sale.customerName}</p>
-                            <p>{sale.phoneNumber}</p>
-                            <p>{sale.email}</p>
-                          </div>
-                        </div>
+                        {financeFiltered[user].map((data) => {
+                          return (
+                            <>
+                            <div className="grid grid-cols-5 gap-4">
+                              <div className="grid col-span-1">
+                                <p>{data.date}</p>
+                              </div>
+                              <div className="grid col-span-1">
+                                <p>{data.type}</p>
+                              </div>
+                              <div className="grid col-span-1">
+                                <p>{data.amount}</p>
+                              </div>
+                              <div className="grid col-span-1">
+                                <p>{data.reason}</p>
+                              </div>
+                              <div className="grid col-span-1">
+                                <p>{data.state}</p>
+                              </div>
+                            </div>
+                            </>
+                          )
+                        })}
                       </PopoverContent>
                     </Popover>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.salesDate[0]}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.paymentType}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.price}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                      {financeFiltered[user].reduce((sum, a) => {
+                        if (a.type === 'sale') {
+                          return sum += parseInt(a.amount)
+                        }
+                        return sum
+                      }, 0)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                      {financeFiltered[user].reduce((sum, a) => {
+                        if (a.type === 'expense') {
+                          return sum += parseInt(a.amount)
+                        }
+                        return sum
+                      }, 0)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                      {financeFiltered[user].reduce((sum, a) => {
+                        if (a.type === 'imbersement') {
+                          return sum += parseInt(a.amount)
+                        }
+                        return sum
+                      }, 0)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                      {financeFiltered[user].reduce((sum, a) => {
+                        if (a.type === 'sale' || a.type === 'imbersement') {
+                          sum += parseInt(a.amount)
+                        } else {
+                          sum -= parseInt(a.amount)
+                        }
+                        return sum;
+                      }, 0)}
+                    </td>
                   </tr>
                 )
-              })}
-            </tbody>
-          </table>
-
-          <span className="font-medium text-blue-500">
-              revenu
-          </span>
-
-          <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">
-            <thead>
-              <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  VIN nombre
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  date
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  montant/$
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {revenueFiltered.map((sale) => {
-                let dates = sale.salesDate;
-                return dates.map((date, i) => {
-                  return (
-                    date >= salesDateRange.from && date <= salesDateRange.to
-                    ?
-                    <tr key={`${sale.vin}-revenue-${i}`}>
-                    <Popover>
-                      <PopoverHandler>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{sale.vin}</td>
-                      </PopoverHandler>
-                      <PopoverContent>
-                        <div className="grid grid-cols-5">
-                          <div className="grid col-span-2">
-                            <p>prix/$</p>
-                            <p>ventes montante/$</p>
-                            <p>ventes équilibre/$</p>
-                            <p>nom du client</p>
-                            <p>numéro de téléphone du client</p>
-                            <p>email client</p>
-                          </div>
-                          <div className="grid col-span-1">
-                          </div>
-                          <div className="grid col-span-2">
-                            <p>{sale.price}</p>
-                            <p>{sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
-                            <p>{sale.price - sale.income.reduce((sum, a) => sum += parseInt(a), 0)}</p>
-                            <p>{sale.customerName}</p>
-                            <p>{sale.phoneNumber}</p>
-                            <p>{sale.email}</p>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{date}</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{sale.income[i]}</td>
-                    </tr>
-                    :
-                    <></>
-                  )
-                })
               })}
             </tbody>
           </table>
@@ -728,7 +698,7 @@ function Dashboard() {
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
             <span>
-              aperçu des dépenses
+              acheté des voitures
               <span className="ml-5 text-2xl">
                 ${expense}
               </span>
@@ -820,9 +790,7 @@ function Dashboard() {
                             <p>modèle</p>
                             <p>année</p>
                             <p>emplacement</p>
-                            <p>initiales/$</p>
-                            <p>supplémentaire/$</p>
-                            <p>totale/$</p>
+                            <p>montante/$</p>
                             <p>statut</p>
                           </div>
                           <div className="grid col-span-1">
@@ -833,8 +801,6 @@ function Dashboard() {
                             <p>{product.year}</p>
                             <p>{product.location}</p>
                             <p>{product.initial}</p>
-                            <p>{product.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
-                            <p>{product.initial + product.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
                             <p>{product.state}</p>
                           </div>
                         </div>
@@ -847,79 +813,8 @@ function Dashboard() {
               })}
             </tbody>
           </table>
-
-          <span className="font-medium text-blue-500">
-            supplémentaire dépenses
-          </span>
-
-          <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">
-            <thead>
-              <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  VIN nombre
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  date
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  montant/$
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {expenseFiltered.map((expense) => {
-                let dates = expense.additional.map((i) => i.date);
-                return dates.map((date, i) => {
-                  return (
-                    date >= expenseDateRange.from && date <= expenseDateRange.to
-                    ?
-                    <tr key={`${expense.vin}-expense-${i}`}>
-                    <Popover>
-                      <PopoverHandler>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{expense.vin}</td>
-                      </PopoverHandler>
-                      <PopoverContent>
-                        <div className="grid grid-cols-5">
-                          <div className="grid col-span-2">
-                            <p>fabricante</p>
-                            <p>modèle</p>
-                            <p>année</p>
-                            <p>emplacement</p>
-                            <p>initiales/$</p>
-                            <p>supplémentaire/$</p>
-                            <p>totale/$</p>
-                            <p>statut</p>
-                            <p>explication</p>
-                          </div>
-                          <div className="grid col-span-1">
-                          </div>
-                          <div className="grid col-span-2">
-                            <p>{expense.manufacturer}</p>
-                            <p>{expense.model}</p>
-                            <p>{expense.year}</p>
-                            <p>{expense.location}</p>
-                            <p>{expense.initial}</p>
-                            <p>{expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
-                            <p>{expense.initial + expense.additional.reduce((sum, a) => sum += parseInt(a.amount), 0)}</p>
-                            <p>{expense.state}</p>
-                            <p>{expense.additional[i].reason}</p>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{date}</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">{expense.additional[i].amount}</td>
-                    </tr>
-                    :
-                    <></>
-                  )
-                })
-              })}
-            </tbody>
-          </table>
         </div>
       </div>
-
     </div>
   );
 }
