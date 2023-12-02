@@ -1,19 +1,18 @@
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../config/firebase.config";
 
-export default function AddExpense({
-  collectionRef,
+export default function AddVinExpense({
   addExpenseModalSetting,
   handlePageUpdate,
   updateProduct
 }) {
-  console.log(updateProduct);
+  const useremail = JSON.parse(localStorage.getItem('user')).email;
   const [expense, setExpense] = useState({
     date: '',
-    type: '',
+    type: 'expense',
     amount: '',
     reason: '',
     state: 'not approved'
@@ -31,13 +30,19 @@ export default function AddExpense({
   const add = async () => {
     if (expense.date !== '' && expense.type !== '' && expense.amount !== '' && expense.reason !== '') {
       try {
-        await addDoc(collectionRef, {
+        await addDoc(collection(db, 'finances', useremail, 'finances'), {
           date: expense.date,
           type: expense.type,
           amount: expense.amount,
-          reason: expense.reason,
+          reason: updateProduct.vin + '-> ' + expense.reason,
           state: expense.state
-        })
+        });
+        await addDoc(collection(db, 'products', updateProduct._id, 'additional'), {
+            date: expense.date,
+            amount: expense.amount,
+            reason: expense.reason,
+            state: expense.state
+        });
         addExpenseModalSetting();
         handlePageUpdate();
       } catch (err) {
@@ -84,7 +89,7 @@ export default function AddExpense({
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                      <PlusIcon
+                      <MinusIcon
                         className="h-6 w-6 text-blue-400"
                         aria-hidden="true"
                       />
@@ -94,7 +99,7 @@ export default function AddExpense({
                         as="h3"
                         className="text-lg  py-4 font-semibold leading-6 text-gray-900 "
                       >
-                        ajouter {updateProduct && updateProduct.vin}
+                        {updateProduct && updateProduct.vin}
                       </Dialog.Title>
                       <form action="#">
                         <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -135,27 +140,6 @@ export default function AddExpense({
                               placeholder="Amount"
                             />
                           </div>
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="type"
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            genre
-                          </label>
-                            <select
-                              id="type"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              name="type"
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value.trim())
-                              }
-                            >
-                              <option selected disabled>Sélectionnez le type de financement</option>
-                              <option>sale</option>
-                              <option>expense</option>
-                              <option>imbersement</option>
-                            </select>
                         </div>
                         <div>
                           <label

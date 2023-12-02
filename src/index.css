@@ -20,8 +20,8 @@ code {
 
 td {
   min-width: 50px;
-  /* max-width: 200px; Set the desired width for the <td> element */
-  /* overflow: hidden;  */
-  /* white-space: nowrap; Prevent line breaks within the cell */
-  /* text-overflow: ellipsis; Show an ellipsis (...) when the content is too long */
+  max-width: 400px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

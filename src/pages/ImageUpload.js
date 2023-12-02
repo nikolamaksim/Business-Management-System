@@ -28,15 +28,12 @@ function ImageUpload() {
 
     // Upload Image
     const upload = async (e, element) => {
-        console.log(e.target.id.split(' ')[0]);
-        console.log(e.target.files[0]);
         const storageRef = ref(storage, `images/${element.vin}/${e.target.id.split(' ')[0]}/${e.target.files[0].name}`);
         try {
             await uploadBytes(storageRef, e.target.files[0]);
             const docSnap = (await getDoc(doc(db, 'products' , element._id))).data();
             getDownloadURL(storageRef)
             .then((url) => {
-                console.log(url);
                 if (e.target.id.split(' ')[0] === 'mainImage') {
                     updateDoc(doc(db, 'products', element._id), {
                         mainImageUrl: url,

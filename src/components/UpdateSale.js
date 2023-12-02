@@ -1,4 +1,5 @@
-import { doc, updateDoc, getDoc,} from 'firebase/firestore';
+import { doc, updateDoc, getDoc, addDoc, collection} from 'firebase/firestore';
+import { db } from '../config/firebase.config';
 
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -11,6 +12,8 @@ export default function UpdateSale({
   vinArray,
   updateInfo,
 }) {
+
+  const useremail = JSON.parse(localStorage.getItem('user')).email;
 
   const [sale, setSale] = useState({
     salesDate: '',
@@ -43,6 +46,15 @@ export default function UpdateSale({
                 salesData.income.push(sale.income);
                 salesData.state.push('not approved');
                 salesData.receipt = false;
+
+                // Add Finance
+                await addDoc(collection(db, 'finances', useremail, 'finances'), {
+                  amount: sale.income,
+                  date: sale.salesDate,
+                  reason: `${sale.income} from ${sale.customerName} (${sale.phoneNumber}, ${sale.email}) for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year}).`,
+                  state: 'not approved',
+                  type: 'sale',
+                });
               }
             }
             salesData.paymentType = sale.paymentType;
@@ -52,6 +64,11 @@ export default function UpdateSale({
             salesData.email = sale.email;
             salesData.receipt = false;
             await updateDoc(docRef, salesData);
+
+            
+
+
+
             updateSaleModalSetting();
             handlePageUpdate();
           } catch (err) {
@@ -202,7 +219,7 @@ export default function UpdateSale({
                               id="income"
                               name="income"
                               value={sale.income}
-                              placeholder={updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0)}
+                              placeholder={updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0).toLocaleString()}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }

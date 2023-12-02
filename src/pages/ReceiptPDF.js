@@ -82,8 +82,8 @@ const ReceiptPDF = ({ sales }) => (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Détails du contrat</Text>
           <Text style={styles.sectionContent}>Type de paiement: {sales.paymentType}</Text>
-          <Text style={styles.sectionContent}>Prix ​total/$: {sales.price}</Text>
-          <Text style={{...styles.sectionContent, fontWeight:'bold', color: 'orange'}}>Solde impayé/$: {parseInt(sales.price) - sales.income.reduce((sum, a) => sum += parseInt(a), 0)}</Text>
+          <Text style={styles.sectionContent}>Prix total/CFA: {parseInt(sales.price).toLocaleString()}</Text>
+          <Text style={{...styles.sectionContent, fontWeight:'bold', color: 'orange'}}>Solde impayé/CFA: {(parseInt(sales.price) - sales.income.reduce((sum, a) => sum += parseInt(a), 0)).toLocaleString()}</Text>
         </View>
       </View>
       <View style={styles.sectionContainer}>
@@ -91,7 +91,7 @@ const ReceiptPDF = ({ sales }) => (
           <Text style={styles.sectionTitle}>Historique de paiement</Text>
           {Array.from({ length: sales.income.length }, (_, index) => index).map((i) => {
             return (
-              <Text style={styles.sectionContent}>{sales.salesDate[i]}: ${sales.income[i]}</Text>
+              <Text style={styles.sectionContent}>{sales.salesDate[i]}: CFA {parseInt(sales.income[i]).toLocaleString()}</Text>
             )
           })}
         </View>

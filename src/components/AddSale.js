@@ -2,8 +2,9 @@ import { db } from "../config/firebase.config";
 import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, query, } from 'firebase/firestore';
 
 import { Fragment, useRef, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 export default function AddSale({
   collectionRef,
@@ -11,6 +12,16 @@ export default function AddSale({
   handlePageUpdate,
   vinArray,
 }) {
+
+  const useremail = JSON.parse(localStorage.getItem('user')).email;
+
+  const [query, setQuery] = useState('');
+  const vinArrayFiltered = 
+    query === ''
+    ? vinArray
+    : vinArray.filter((vin) => {
+      return vin.toLowerCase().includes(query.toLowerCase());
+    });
 
   const [sale, setSale] = useState({
     vinNumber: '',
@@ -31,6 +42,10 @@ export default function AddSale({
   const handleInputChange = (key, value) => {
     setSale({ ...sale, [key]: value });
   };
+
+  const setVinNumber = (vin) => {
+    handleInputChange('vinNumber', vin);
+  }
 
   // POST Data
   const addSale = async () => {
@@ -74,6 +89,15 @@ export default function AddSale({
             receipt: false,
             timestamp: serverTimestamp(),
           });
+
+          await addDoc(collection(db, 'finances', useremail, 'finances'), {
+            amount: sale.income,
+            date: sale.salesDate,
+            reason: `${sale.income} from ${sale.customerName} (${sale.phoneNumber}, ${sale.email}) for ${manufacturer} ${model} (${year}).`,
+            state: 'not approved',
+            type: 'sale',
+          });
+
           addSaleModalSetting();
           handlePageUpdate();
         } catch (err) {
@@ -140,24 +164,77 @@ export default function AddSale({
                             >
                               VIN nombre
                             </label>
-                            <select
+                            <Combobox
                               name="vinNumber"
-                              id="vinNumber"
-                              value={sale.vin}
-                              onChange={(e) =>
-                                handleInputChange(e.target.name, e.target.value)
-                              }
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              value={sale.vinNumber}
+                              onChange={setVinNumber}
                             >
-                              <option disabled selected>choisir VIN nombre</option>
-                              {vinArray.map((element, id) => {
-                                return (
-                                  <option key = {`${element}${id}`} value={element}>
-                                    {element}
-                                  </option>
-                                )
-                              })}
-                            </select>
+                              <div className="relative mt-1">
+                                <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
+                                  <Combobox.Input
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    displayValue={(vin) => vin}
+                                    onChange={(event) => setQuery(event.target.value)}
+                                  />
+                                  <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <ChevronUpDownIcon
+                                      className="h-5 w-5 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                  </Combobox.Button>
+                                </div>
+                                <Transition
+                                  as={Fragment}
+                                  leave="transition ease-in duration-100"
+                                  leaveFrom="opacity-100"
+                                  leaveTo="opacity-0"
+                                  afterLeave={() => setQuery('')}
+                                >
+                                  <Combobox.Options 
+                                    name='vinNumber'
+                                    className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                    {vinArrayFiltered.length === 0 && query !== '' ? (
+                                      <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
+                                        Nothing found.
+                                      </div>
+                                    ) : (
+                                      vinArrayFiltered.map((vin, i) => (
+                                        <Combobox.Option
+                                          key={vin}
+                                          className={({ active }) =>
+                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                              active ? 'bg-gray-700 text-white' : 'text-gray-700'
+                                            }`
+                                          }
+                                          value={vin}
+                                        >
+                                          {({ selected, active }) => (
+                                            <>
+                                              <span
+                                                className={`block truncate ${
+                                                  selected ? 'font-medium' : 'font-normal'
+                                                }`}
+                                              >
+                                                {vin}
+                                              </span>
+                                              {selected ? (
+                                                <span
+                                                  className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                                    active ? 'text-white' : 'text-gray-700'
+                                                  }`}
+                                                >
+                                                  <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                              ) : null}
+                                            </>
+                                          )}
+                                        </Combobox.Option>
+                                      ))
+                                    )}
+                                  </Combobox.Options>
+                                </Transition>
+                              </div>
+                            </Combobox>
                           </div>
                           <div>
                             <label

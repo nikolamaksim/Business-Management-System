@@ -104,12 +104,12 @@ function Sales() {
           year: element.year,
           customerName: element.customerName,
           paymentType: element.paymentType,
-          price: element.price,
+          price: parseInt(element.price).toLocaleString(),
           salesDate: element.salesDate[0],
           lastSalesDate: element.salesDate[element.salesDate.length - 1],
-          lastPay: element.income[element.income.length - 1],
-          totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0),
-          balance: element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0),
+          lastPay: parseInt(element.income[element.income.length - 1]).toLocaleString(),
+          totalPay: element.income.reduce((sum, a) => sum += parseInt(a), 0).toLocaleString(),
+          balance: (element.price - element.income.reduce((sum, a) => sum += parseInt(a), 0)).toLocaleString(),
           date: new Date().toLocaleDateString(),
         };
     
@@ -192,13 +192,13 @@ function Sales() {
                     type de paiement
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    prix/$
+                    prix/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    ventes montante/$
+                    ventes montante/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    ventes équilibre/$
+                    ventes équilibre/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     statut approuvé
@@ -229,12 +229,12 @@ function Sales() {
                         {element.paymentType}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {element.price}
+                        {parseInt(element.price).toLocaleString()}
                       </td>
                       <Popover>
                         <PopoverHandler>
                           <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100">
-                            <span>{element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)}</span>
+                            <span>{element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0).toLocaleString()}</span>
                           </td>
                         </PopoverHandler>
                         <PopoverContent>
@@ -246,7 +246,7 @@ function Sales() {
                             </div>
                             <div className="ml-3">
                               {element.income.map((item, index) => {
-                                return <p key={`${element._id}${item}${index}`}>${item}</p>
+                                return <p key={`${element._id}${item}${index}`}>CFA {parseInt(item).toLocaleString()}</p>
                               })}
                             </div>
                             <div className="ml-3">
@@ -258,7 +258,7 @@ function Sales() {
                         </PopoverContent>
                       </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {element.price - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)}
+                        {(element.price - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)).toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
@@ -353,13 +353,13 @@ function Sales() {
                     type de paiement
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    prix/$
+                    prix/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    ventes montant/$
+                    ventes montant/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    ventes équilibre/$
+                    ventes équilibre/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     statut approuvé
@@ -390,12 +390,12 @@ function Sales() {
                         {element.paymentType}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {element.price}
+                        {parseInt(element.price).toLocaleString()}
                       </td>
                       <Popover>
                         <PopoverHandler>
                           <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100">
-                            <span>{element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)}</span>
+                            <span>{element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0).toLocaleString()}</span>
                           </td>
                         </PopoverHandler>
                         <PopoverContent>
@@ -407,7 +407,7 @@ function Sales() {
                             </div>
                             <div className="ml-3">
                               {element.income.map((item, index) => {
-                                return <p key={`${element._id}${item}${index}`}>${item}</p>
+                                return <p key={`${element._id}${item}${index}`}>${parseInt(item).toLocaleString()}</p>
                               })}
                             </div>
                             <div className="ml-3">
@@ -419,7 +419,7 @@ function Sales() {
                         </PopoverContent>
                       </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {element.price - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)}
+                        {(element.price - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)).toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
