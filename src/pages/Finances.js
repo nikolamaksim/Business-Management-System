@@ -23,20 +23,6 @@ function Finance() {
 
   const [financeFiltered, setFinanceFiltered] = useState([])
 
-  useEffect(() => {
-    if (financeDateRange.from && financeDateRange.to) {
-      const financeFiltered = expense.filter((expense) => {
-        return (expense.date >= financeDateRange.from && expense.date <= financeDateRange.to)
-      })
-      setFinanceFiltered(financeFiltered);
-      handlePageUpdate();
-    }
-  }, [financeDateRange, updatePage])
-
-  useEffect(() => {
-    fetchExpenseData();
-  }, [updatePage]);
-
   // Fetch Data of ALl Expense Items
   const fetchExpenseData = async () => {
     try {
@@ -68,9 +54,23 @@ function Finance() {
     setShowAddExpenseModal(!showAddExpenseModal);
   };
 
-  // Handle Page Update
+  useEffect(() => {
+    if (financeDateRange.from && financeDateRange.to) {
+      const filteredExpenses = expense.filter((expense) => {
+        return (expense.date >= financeDateRange.from && expense.date <= financeDateRange.to)
+      })
+      setFinanceFiltered(filteredExpenses);
+    } else {
+      setFinanceFiltered([]);
+    }
+  }, [financeDateRange, expense]);
+  
+  useEffect(() => {
+    fetchExpenseData();
+  }, [updatePage]);
+  
   const handlePageUpdate = () => {
-    setUpdatePage(!updatePage);
+    setUpdatePage(prevState => !prevState);
   };
 
   return (

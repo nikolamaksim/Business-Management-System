@@ -10,7 +10,7 @@ export default function AddExpense({
   handlePageUpdate,
   updateProduct
 }) {
-  console.log(updateProduct);
+  
   const [expense, setExpense] = useState({
     date: '',
     type: '',

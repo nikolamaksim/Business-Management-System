@@ -35,11 +35,13 @@ export default function UpdateSale({
 
   // POST Data
   const addSale = async () => {
+    console.log(sale.import,sale.paymentType , updateInfo.import);
           try {
             const docRef = doc(collectionRef, updateInfo._id);
             const docSnap = await getDoc(docRef);
             let salesData = docSnap.data();
             if (sale.salesDate && sale.income) {
+              console.log('update')
               if (sale.income > sale.price - salesData.income.reduce((sum, a) => sum += a, 0)) {
                 window.alert('Veuillez confirmer à nouveau le montant de vos ventes.')
               } else {
@@ -47,15 +49,16 @@ export default function UpdateSale({
                 if (sale.import !== updateInfo.import) {
                   salesData.import = sale.import;
                   salesData.importState = 'not approved';
-
+    
                   await addDoc(collection(db, 'finances', useremail, 'finances'), {
                     amount: sale.import - updateInfo.import,
                     date: sale.salesDate,
-                    reason: `${sale.import - updateInfo.import} as import adjustment.`,
+                    reason: `${sale.import - updateInfo.import} as import adjustment for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
                     state: 'not approved',
                     type: 'expense',
                   });
                 }
+                
 
                 salesData.salesDate.push(sale.salesDate);
                 salesData.income.push(sale.income);
@@ -72,6 +75,21 @@ export default function UpdateSale({
                 });
               }
             }
+            else if (sale.import !== updateInfo.import) {
+              console.log('sdfsdfsd')
+              salesData.import = sale.import;
+              salesData.importState = 'not approved';
+
+              await addDoc(collection(db, 'finances', useremail, 'finances'), {
+                amount: sale.import - updateInfo.import,
+                date: sale.salesDate,
+                reason: `${sale.import - updateInfo.import} as import adjustment for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
+                state: 'not approved',
+                type: 'expense',
+              });
+            }
+            console.log(sale.import,sale.paymentType , updateInfo.import);
+
             salesData.paymentType = sale.paymentType;
             salesData.price = sale.price;
             salesData.customerName = sale.customerName;
