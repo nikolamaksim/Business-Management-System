@@ -1,5 +1,5 @@
 import { db } from "../config/firebase.config";
-import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, query, } from 'firebase/firestore';
+import { collection, doc, addDoc, serverTimestamp, getDocs, where, updateDoc, query } from 'firebase/firestore';
 
 import { Fragment, useRef, useState } from "react";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
@@ -15,12 +15,12 @@ export default function AddSale({
 
   const useremail = JSON.parse(localStorage.getItem('user')).email;
 
-  const [query, setQuery] = useState('');
+  const [searchQuery, setQuery] = useState('');
   const vinArrayFiltered = 
-    query === ''
+    searchQuery === ''
     ? vinArray
     : vinArray.filter((vin) => {
-      return vin.toLowerCase().includes(query.toLowerCase());
+      return vin.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
   const [sale, setSale] = useState({
@@ -29,6 +29,7 @@ export default function AddSale({
     paymentType: '',
     price: '',
     income: '',
+    import: '',
     customerName: '',
     phoneNumber: '',
     email: '',
@@ -55,6 +56,7 @@ export default function AddSale({
       !sale.paymentType ||
       !sale.price ||
       !sale.income ||
+      !sale.import ||
       !sale.customerName ||
       !sale.phoneNumber ||
       !sale.email
@@ -82,6 +84,8 @@ export default function AddSale({
             paymentType: sale.paymentType,
             price: sale.price,
             income: [sale.income],
+            import: sale.import,
+            importState: 'not approved',
             state: ['not approved'],
             customerName: sale.customerName,
             phoneNumber: sale.phoneNumber,
@@ -96,6 +100,14 @@ export default function AddSale({
             reason: `${sale.income} from ${sale.customerName} (${sale.phoneNumber}, ${sale.email}) for ${manufacturer} ${model} (${year}).`,
             state: 'not approved',
             type: 'sale',
+          });
+
+          await addDoc(collection(db, 'finances', useremail, 'finances'), {
+            amount: sale.import,
+            date: sale.salesDate,
+            reason: `${sale.import} as import for ${manufacturer} ${model} (${year}).`,
+            state: 'not approved',
+            type: 'expense',
           });
 
           addSaleModalSetting();
@@ -193,7 +205,7 @@ export default function AddSale({
                                   <Combobox.Options 
                                     name='vinNumber'
                                     className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-black/5 focus:outline-none sm:text-sm">
-                                    {vinArrayFiltered.length === 0 && query !== '' ? (
+                                    {vinArrayFiltered.length === 0 && searchQuery !== '' ? (
                                       <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                                         Nothing found.
                                       </div>
@@ -306,6 +318,24 @@ export default function AddSale({
                               id="income"
                               name="income"
                               value={sale.income}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="import"
+                            >
+                              import
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="number"
+                              id="import"
+                              name="import"
+                              value={sale.import}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }

@@ -164,7 +164,7 @@ function PurchaseDetails() {
         )}
 
         {showVinExpenseModal && (
-          <AddVinExpense 
+          <AddVinExpense
             handlePageUpdate={handlePageUpdate}
             addExpenseModalSetting={addExpenseModalSetting}
             updateProduct={updateProduct}

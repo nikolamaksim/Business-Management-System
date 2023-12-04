@@ -1,4 +1,4 @@
-import {collection, getDocs, doc, where, updateDoc, getDoc, query} from 'firebase/firestore'
+import { collection, getDocs, doc, where, updateDoc, getDoc, query } from 'firebase/firestore'
 
 import { db } from '../config/firebase.config'
 
@@ -61,6 +61,7 @@ function Sales() {
       for (let i in docSnap.state) {
         docSnap.state[i] = 'approved'
       }
+      docSnap.importState = 'approved'
       updateDoc(docRef, docSnap);
       handlePageUpdate();
     } catch (err) {
@@ -166,16 +167,19 @@ function Sales() {
               <span className="font-bold">ventes</span>
               <SearchByVIN />
             </div>
-            <div className="flex gap-4">
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
-                onClick={addSaleModalSetting}
-              >
-                ajouter ventes
-              </button>
+            {
+              JSON.parse(localStorage.getItem('user')).role === 'super' ?
+              <></> :
+              <div className="flex gap-4">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
+                  onClick={addSaleModalSetting}
+                >
+                  ajouter ventes
+                </button>
+              </div>
+            }
             </div>
-          </div>
-
           {
             JSON.parse(localStorage.getItem('user')).role === 'super'
             ?
@@ -196,6 +200,9 @@ function Sales() {
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     ventes montante/CFA
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    import/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     ventes équilibre/CFA
@@ -257,8 +264,18 @@ function Sales() {
                           </div>
                         </PopoverContent>
                       </Popover>
+                      <Popover>
+                        <PopoverHandler>
+                          <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100">
+                            {parseInt(element.import).toLocaleString()}
+                          </td>
+                        </PopoverHandler>
+                        <PopoverContent>
+                          <p>{element.importState}</p>
+                        </PopoverContent>
+                      </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                        {(element.price - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)).toLocaleString()}
+                        {(element.price  - element.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0)).toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {element.state.length ? element.state[element.state.length - 1] : ''}
@@ -359,6 +376,9 @@ function Sales() {
                     ventes montant/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                    import/CFA
+                  </th>
+                  <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     ventes équilibre/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -407,7 +427,7 @@ function Sales() {
                             </div>
                             <div className="ml-3">
                               {element.income.map((item, index) => {
-                                return <p key={`${element._id}${item}${index}`}>${parseInt(item).toLocaleString()}</p>
+                                return <p key={`${element._id}${item}${index}`}>CFA {parseInt(item).toLocaleString()}</p>
                               })}
                             </div>
                             <div className="ml-3">
@@ -416,6 +436,16 @@ function Sales() {
                               })}
                             </div>
                           </div>
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverHandler>
+                          <td className="whitespace-nowrap px-4 py-2 text-gray-700 cursor-pointer hover:bg-slate-100">
+                            {parseInt(element.import).toLocaleString()}
+                          </td>
+                        </PopoverHandler>
+                        <PopoverContent>
+                          <p>{element.importState}</p>
                         </PopoverContent>
                       </Popover>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">

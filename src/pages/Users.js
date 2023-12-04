@@ -16,13 +16,30 @@ function Users() {
   const [expense, setExpense] = useState([]);
   const [username, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+
+  const [financeFiltered, setFinanceFiltered] = useState([])
   
   
   const authContext = useContext(AuthContext);
 
+  // Variables for Filtering
+  const [financeDateRange, setFinanceDateRange] = useState({
+    from: '',
+    to: ''
+  });
+
   useEffect(() => {
     fetchUserData();
   }, [updatePage]);
+
+  useEffect(() => {
+    if (financeDateRange.from && financeDateRange.to) {
+      const financeFiltered = expense.filter((expense) => {
+        return (expense.date >= financeDateRange.from && expense.date <= financeDateRange.to)
+      })
+      setFinanceFiltered(financeFiltered);
+    }
+  }, [financeDateRange])
 
   // Fetch Data of ALl User Items
   const fetchUserData= async () => {
@@ -40,6 +57,7 @@ function Users() {
     try {
       const ExpenseData = await getDocs(collection(db, 'finances', useremail, 'finances'));
       let expense = ExpenseData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
+      expense = expense.sort((a, b) => (a.date > b.date) ? -1 : 1);
       setExpense(expense);
     } catch (err) {
       console.log(err);
@@ -194,9 +212,49 @@ function Users() {
 
         {/* employee finances */}
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 mb-10">
-          <div className="flex justify-between pt-5 pb-3 px-3">
-            <div className="flex gap-4 justify-center items-center ">
+          <div className="grid grid-cols-12 flex justify-between pt-5 pb-3 px-3">
+            <div className="grid col-span-3 flex gap-4 justify-center items-center ">
               <span className="font-bold">{username}</span>
+            </div>
+            <div className="grid col-span-4">
+            </div>         
+            <div className="grid col-span-4 gap-4 mb-4 sm:grid-cols-2">
+              <div className="m-auto">
+                <label
+                  htmlFor="expenseDateFrom"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  de
+                </label>
+                <input
+                  type="date"
+                  name="expenseDateFrom"
+                  id="expenseDateFrom"
+                  value={financeDateRange.from}
+                  onChange={(e) =>
+                    setFinanceDateRange({...financeDateRange, from: e.target.value})
+                  }
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
+              <div className="m-auto">
+                <label
+                  htmlFor="expenseDateTo"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  à
+                </label>
+                <input
+                  type="date"
+                  name="expenseDateTo"
+                  id="expenseDateTo"
+                  value={financeDateRange.to}
+                  onChange={(e) =>
+                    setFinanceDateRange({...financeDateRange, to: e.target.value})
+                  }
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
             </div>
           </div>
 
@@ -207,7 +265,7 @@ function Users() {
                   date
                 </th>  
                 <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                  genre
+                  catégorie
                 </th>  
                 <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                   montante/CFA
@@ -222,7 +280,7 @@ function Users() {
             </thead>
             <tbody>
               {
-                expense.map((element, index) => {
+                financeFiltered.map((element, index) => {
                   return (
                     <tr key={element._id}>
                     <td className="whitespace-nowrap px-2 py-2 text-gray-900">

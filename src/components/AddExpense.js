@@ -141,7 +141,7 @@ export default function AddExpense({
                             htmlFor="type"
                             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                           >
-                            genre
+                            catégorie
                           </label>
                             <select
                               id="type"

@@ -58,21 +58,21 @@ function Dashboard() {
         ) {
           revenueDataFiltered[key] = revenueData[key]
         }
-        // if (
-        //   salesData[key].salesDate >= expenseDateRange.from &&
-        //   salesData[key].salesDate <= expenseDateRange.to
-        // ) {
-        //   salesDataFiltered[key] = salesData[key]
-        // }
       })
-      // setSalesDataFiltered(salesDataFiltered);
+
+      // const sortedEntries = Object.entries(revenueDataFiltered).sort((a, b) => a[1].date - b[1].date);
+
+      // sortedEntries.forEach(([key, value]) => {
+      //   revenueDataFiltered[key] = value;
+      // });
+
       setRevenueDataFiltered(revenueDataFiltered);
       revenue = Object.values(revenueDataFiltered).map((revenue) =>{
         return (
-          parseInt(revenue.salesAmount - revenue.expenseAmount)
+          parseInt(revenue.salesAmount - revenue.expenseAmount - revenue.importAmount)
         )
       })
-      setRevenue(revenue.toLocaleString());
+      setRevenue(revenue.reduce((sum,a) => sum += a), 0);
     } else {
       setRevenueDataFiltered({});
       setRevenue(0);
@@ -90,6 +90,19 @@ function Dashboard() {
         ))
       })
     }
+
+  //   Object.keys(financeFiltered).forEach(key => {
+  //   const obj = financeFiltered[key];
+  //   const sortedEntries = Object.entries(obj).sort((a, b) => a[1].date > b[1].date ? -1 : 1);
+  //   const sortedObject = {};
+
+  //   sortedEntries.forEach(([innerKey, value]) => {
+  //     sortedObject[innerKey] = value;
+  //   });
+
+  //   financeFiltered[key] = sortedObject;
+  // });
+
     setFinanceFiltered(financeFiltered)
   }, [financeDateRange])
 
@@ -270,7 +283,6 @@ function Dashboard() {
             totalSaleAmount += parseInt(sale.income[i])
           }
         })
-        totalSaleAmount = totalSaleAmount.toLocaleString()
         // totalSaleAmount += sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0);
         sale.price <= sale.income.reduce((partialSum, a) => parseInt(partialSum) + parseInt(a), 0) 
         ?
@@ -292,37 +304,45 @@ function Dashboard() {
       const revenueData = {}
 
       for (const sale of salesData) {
-        let salesDetail, salesAmount = 0, expenseAmount = 0, salesDate = 0;
+        let salesDetail, salesAmount = 0, expenseAmount = 0, salesDate = 0, importAmount = 0;
         sale.income.map((value, i) => {
           if (sale.state[i] === 'approved')  {
             salesAmount += parseInt(value);
-            salesDetail = sale;
           }
         });
+
+        salesDetail = sale;
+
         salesDate = sale.salesDate[0];
+
         const q = query(collection(db, 'products'), where('vin', '==', sale.vin));
         const docSnap = (await getDocs(q)).docs[0];
         const additionalDocs = await getDocs(collection(db, 'products', docSnap.id, 'additional'))
         const additional = additionalDocs.docs.map((doc) => {
           return doc.data();
         });
+
         expenseAmount = 
           parseInt(docSnap.data().initial) + 
           additional.reduce((sum, a) => {
             if (a.state === 'approved') {
-              return sum += parseInt(a.amount)
+              sum += parseInt(a.amount)
             }
+            return sum
           }, 0);
+
+        if (sale.importState ===  'approved') {
+          importAmount = sale.import;
+        }
 
         revenueData[sale.vin] = {
           salesDetail: salesDetail,
           salesAmount: salesAmount,
           expenseAmount: expenseAmount,
-          salesDate: salesDate
+          importAmount: importAmount,
+          salesDate: salesDate,
         }
-
         setRevenueData(revenueData);
-
       }
 
     } catch(err) {
@@ -485,7 +505,7 @@ function Dashboard() {
     const worksheet = workbook.addWorksheet('Sheet1');
     
     const data = [
-      ['VIN', 'date', 'expenses/CFA', 'sales/CFA', 'revenue/CFA', 'paymentType', 'price/CFA', 'customerName', 'email', 'carInformation']
+      ['VIN', 'date', 'depenses/CFA', 'ventes/CFA', 'import/CFA', 'revenu/CFA', 'type de paiement', 'prix/CFA', 'nom du client', 'email', 'informations sur la voiture']
     ];
 
     await Object.keys(revenueDataFiltered).map((key) => {
@@ -495,7 +515,8 @@ function Dashboard() {
           revenueDataFiltered[key].salesDate,
           revenueDataFiltered[key].expenseAmount.toLocaleString(),
           revenueDataFiltered[key].salesAmount.toLocaleString(),
-          (parseInt(revenueDataFiltered[key].salesAmount) - parseInt(revenueDataFiltered[key].expenseAmount)).toLocaleString(),
+          parseInt(revenueDataFiltered[key].importAmount).toLocaleString(),
+          (parseInt(revenueDataFiltered[key].salesAmount) - parseInt(revenueDataFiltered[key].expenseAmount) - parseInt(revenueDataFiltered[key].importAmount)).toLocaleString(),
           revenueDataFiltered[key].salesDetail.paymentType,
           parseInt(revenueDataFiltered[key].salesDetail.price).toLocaleString(),
           revenueDataFiltered[key].salesDetail.customerName,
@@ -523,8 +544,27 @@ function Dashboard() {
     for (let i in data[0]) {
       i = Number(i)
       const col = worksheet.getColumn(i+1);
-      col.width = 20;
+      col.width = 25;
     }
+
+    // Find the last row with data in column A
+    const lastRow = worksheet.actualRowCount;
+
+    // Set the formula for the next cell in column A to calculate the sum from A1 to the last row
+    for (let i = 2; i <= lastRow; i++) {
+      worksheet.getCell(`C${lastRow + 1}`).value += parseInt(worksheet.getCell(`C${i}`).value.replaceAll(',', ''));
+      worksheet.getCell(`D${lastRow + 1}`).value += parseInt(worksheet.getCell(`D${i}`).value.replaceAll(',', ''));
+      worksheet.getCell(`E${lastRow + 1}`).value += parseInt(worksheet.getCell(`E${i}`).value.replaceAll(',', ''));
+      worksheet.getCell(`F${lastRow + 1}`).value += parseInt(worksheet.getCell(`F${i}`).value.replaceAll(',', ''));
+    }
+    worksheet.getCell(`C${lastRow + 1}`).value = worksheet.getCell(`C${lastRow + 1}`).value.toLocaleString()
+    worksheet.getCell(`D${lastRow + 1}`).value = worksheet.getCell(`D${lastRow + 1}`).value.toLocaleString()
+    worksheet.getCell(`E${lastRow + 1}`).value = worksheet.getCell(`E${lastRow + 1}`).value.toLocaleString()
+    worksheet.getCell(`F${lastRow + 1}`).value = worksheet.getCell(`F${lastRow + 1}`).value.toLocaleString()
+    // worksheet.getCell(`F${lastRow + 1}`).formula = `SUM(F2:F${lastRow})`;
+    worksheet.getRow(lastRow + 1).eachCell((cell) => {
+      cell.font = { bold: true };
+    })
 
     // Write the workbook to a file
     workbook.xlsx.writeBuffer().then(buffer => {
@@ -560,7 +600,7 @@ function Dashboard() {
 
             <p>
               <span className="text-2xl font-medium text-gray-900">
-                CFA {saleAmount}
+                CFA {saleAmount.toLocaleString()}
               </span>
 
               <span className="font-medium ml-3 inline-flex gap-2 self-end rounded bg-pink-100 px-3">{salesstate.bad}</span>
@@ -635,7 +675,7 @@ function Dashboard() {
           <div>
             <div className="mb-3 text-l">
             <span>
-              aperçu des finances
+              Aperçu des finances
               <span className="ml-5 text-2xl">
                 {/* ${chart.series[0].data.reduce((sum, a) => sum + a, 0)} */}
               </span>
@@ -662,7 +702,7 @@ function Dashboard() {
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
             <span>
-              Employee Finances
+              Aperçu des finances
               <span className="ml-5 text-2xl">
                 {/* ${revenue} */}
               </span>
@@ -764,7 +804,7 @@ function Dashboard() {
                                   <p>{data.type}</p>
                                 </div>
                                 <div className="grid col-span-2">
-                                  <p>{data.amount}</p>
+                                  <p>{parseInt(data.amount).toLocaleString()}</p>
                                 </div>
                                 <div className="grid col-span-4">
                                   <p>{data.reason}</p>
@@ -804,10 +844,12 @@ function Dashboard() {
                     </td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                       {financeFiltered[user].reduce((sum, a) => {
-                        if ((a.type === 'sale' || a.type === 'imbersement') && a.state === 'approved') {
-                          sum += parseInt(a.amount)
-                        } else {
-                          sum -= parseInt(a.amount)
+                        if (a.state === 'approved') {
+                          if (a.type === 'sale' || a.type === 'imbersement') {
+                            sum += parseInt(a.amount);
+                          } else {
+                            sum -= parseInt(a.amount);
+                          }
                         }
                         return sum;
                       }, 0).toLocaleString()}
@@ -827,9 +869,9 @@ function Dashboard() {
           <div>
             <div className="mb-3 text-l">
             <span>
-              Sales Overview:
+              Aperçu des ventes:
               <span className="ml-5 text-2xl">
-                CFA {saleAmount}
+                CFA {saleAmount.toLocaleString()}
               </span>
             </span>
             </div>
@@ -853,9 +895,9 @@ function Dashboard() {
         <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
               <span>
-                Sales Overview
+                Aperçu des ventes:
                 <span className="ml-5 text-2xl">
-                  CFA {revenue}
+                  CFA {parseInt(revenue).toLocaleString()}
                 </span>
               </span>
               <span 
@@ -940,6 +982,9 @@ function Dashboard() {
                   dépenses/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  import/CFA
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                   ventes/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
@@ -980,8 +1025,9 @@ function Dashboard() {
                     </Popover>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-900">{revenueDataFiltered[key].salesDate}</td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-900">{revenueDataFiltered[key].expenseAmount.toLocaleString()}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{parseInt(revenueDataFiltered[key].importAmount).toLocaleString()}</td>
                     <td className="whitespace-nowrap px-4 py-2 text-gray-900">{revenueDataFiltered[key].salesAmount.toLocaleString()}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{(parseInt(revenueDataFiltered[key].salesAmount) - parseInt(revenueDataFiltered[key].expenseAmount)).toLocaleString()}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-900">{(parseInt(revenueDataFiltered[key].salesAmount) - parseInt(revenueDataFiltered[key].expenseAmount) - parseInt(revenueDataFiltered[key].importAmount)).toLocaleString()}</td>
                   </tr>
                 )
               })}

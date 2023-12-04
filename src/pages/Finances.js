@@ -13,7 +13,25 @@ function Finance() {
   const [expense, setExpense] = useState([]);
 
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
-  const [updatePage, setUpdatePage] = useState(true);
+  const [updatePage, setUpdatePage] = useState(true);  
+  
+  // Variables for Filtering
+  const [financeDateRange, setFinanceDateRange] = useState({
+    from: '',
+    to: ''
+  });
+
+  const [financeFiltered, setFinanceFiltered] = useState([])
+
+  useEffect(() => {
+    if (financeDateRange.from && financeDateRange.to) {
+      const financeFiltered = expense.filter((expense) => {
+        return (expense.date >= financeDateRange.from && expense.date <= financeDateRange.to)
+      })
+      setFinanceFiltered(financeFiltered);
+      handlePageUpdate();
+    }
+  }, [financeDateRange, updatePage])
 
   useEffect(() => {
     fetchExpenseData();
@@ -24,6 +42,7 @@ function Finance() {
     try {
       const ExpenseData = await getDocs(collectionRef);
       let expense = ExpenseData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
+      expense.sort((a, b) => (a.date > b.date) ? -1 : 1);
       setExpense(expense);
     } catch (err) {
       console.log(err);
@@ -69,13 +88,54 @@ function Finance() {
 
         {/* Table  */}
         <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
-          <div className="flex justify-between pt-5 pb-3 px-3">
-            <div className="flex gap-4 justify-center items-center ">
+          <div className="grid grid-cols-12 flex justify-between pt-5 pb-3 px-3">
+            <div className="grid col-span-2 flex gap-4 justify-center items-center ">
               <span className="font-bold">{userData.firstName} {userData.lastName}'s finances</span>
+            </div>          
+            <div className="grid col-span-6 gap-4 mb-4 sm:grid-cols-2">
+              <div className="m-auto">
+                <label
+                  htmlFor="expenseDateFrom"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  de
+                </label>
+                <input
+                  type="date"
+                  name="expenseDateFrom"
+                  id="expenseDateFrom"
+                  value={financeDateRange.from}
+                  onChange={(e) =>
+                    setFinanceDateRange({...financeDateRange, from: e.target.value})
+                  }
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
+              <div className="m-auto">
+                <label
+                  htmlFor="expenseDateTo"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  à
+                </label>
+                <input
+                  type="date"
+                  name="expenseDateTo"
+                  id="expenseDateTo"
+                  value={financeDateRange.to}
+                  onChange={(e) =>
+                    setFinanceDateRange({...financeDateRange, to: e.target.value})
+                  }
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
             </div>
-            <div className="flex gap-4">
+            <div className="col-span-2">
+
+            </div>
+            <div className="grid col-span-2 gap-4 items-center">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
+                className="bg-blue-500 hover:bg-blue-700 w-1/2 text-white font-bold p-2 text-xs rounded"
                 onClick={addExpenseModalSetting}
               >
                 ajouter finances
@@ -89,10 +149,10 @@ function Finance() {
                     date
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    genre
+                    catégorie
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    montante
+                    montante/CFA
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     explication
@@ -104,7 +164,7 @@ function Finance() {
               </thead>
 
               <tbody id="myTb" className="divide-y divide-gray-200">
-                {expense.map((element, index) => {
+                {financeFiltered.map((element, index) => {
                   return (
                     <tr key={element._id} className={element.state === 'on sale' ? 'bg-green-100' : element.state === 'sold' ? 'bg-slate-200' : 'bg-white'}>
                       <td className="whitespace-nowrap px-2  text-gray-900">
@@ -114,7 +174,7 @@ function Finance() {
                         {element.type}
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
-                        {element.amount}
+                        {parseInt(element.amount).toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-2 text-gray-700">
                         {element.reason}

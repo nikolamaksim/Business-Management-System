@@ -20,6 +20,7 @@ export default function UpdateSale({
     paymentType: updateInfo.paymentType,
     price: updateInfo.price,
     income: '',
+    import: updateInfo.import,
     customerName: updateInfo.customerName,
     phoneNumber: updateInfo.phoneNumber,
     email: updateInfo.email,
@@ -42,6 +43,20 @@ export default function UpdateSale({
               if (sale.income > sale.price - salesData.income.reduce((sum, a) => sum += a, 0)) {
                 window.alert('Veuillez confirmer à nouveau le montant de vos ventes.')
               } else {
+
+                if (sale.import !== updateInfo.import) {
+                  salesData.import = sale.import;
+                  salesData.importState = 'not approved';
+
+                  await addDoc(collection(db, 'finances', useremail, 'finances'), {
+                    amount: sale.import - updateInfo.import,
+                    date: sale.salesDate,
+                    reason: `${sale.import - updateInfo.import} as import adjustment.`,
+                    state: 'not approved',
+                    type: 'expense',
+                  });
+                }
+
                 salesData.salesDate.push(sale.salesDate);
                 salesData.income.push(sale.income);
                 salesData.state.push('not approved');
@@ -64,10 +79,6 @@ export default function UpdateSale({
             salesData.email = sale.email;
             salesData.receipt = false;
             await updateDoc(docRef, salesData);
-
-            
-
-
 
             updateSaleModalSetting();
             handlePageUpdate();
@@ -203,7 +214,6 @@ export default function UpdateSale({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                              placeholder={updateInfo.price}
                             />
                           </div>
                           <div className="h-fit w-fit">
@@ -220,6 +230,25 @@ export default function UpdateSale({
                               name="income"
                               value={sale.income}
                               placeholder={updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0).toLocaleString()}
+                              onChange={(e) =>
+                                handleInputChange(e.target.name, e.target.value)
+                              }
+                            />
+                          </div>
+                          <div className="h-fit w-fit">
+                            <label
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                              htmlFor="import"
+                            >
+                              import
+                            </label>
+                            <input
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                              type="number"
+                              id="import"
+                              name="import"
+                              value={sale.import}
+                              placeholder={updateInfo.import}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }
