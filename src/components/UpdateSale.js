@@ -35,31 +35,15 @@ export default function UpdateSale({
 
   // POST Data
   const addSale = async () => {
-    console.log(sale.import,sale.paymentType , updateInfo.import);
           try {
             const docRef = doc(collectionRef, updateInfo._id);
             const docSnap = await getDoc(docRef);
             let salesData = docSnap.data();
             if (sale.salesDate && sale.income) {
-              console.log('update')
-              if (sale.income > sale.price - salesData.income.reduce((sum, a) => sum += a, 0)) {
+              if (sale.income > sale.price - updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0)) {
                 window.alert('Veuillez confirmer à nouveau le montant de vos ventes.')
               } else {
-
-                if (sale.import !== updateInfo.import) {
-                  salesData.import = sale.import;
-                  salesData.importState = 'not approved';
-    
-                  await addDoc(collection(db, 'finances', useremail, 'finances'), {
-                    amount: sale.import - updateInfo.import,
-                    date: sale.salesDate,
-                    reason: `${sale.import - updateInfo.import} as import adjustment for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
-                    state: 'not approved',
-                    type: 'expense',
-                  });
-                }
                 
-
                 salesData.salesDate.push(sale.salesDate);
                 salesData.income.push(sale.income);
                 salesData.state.push('not approved');
@@ -75,20 +59,18 @@ export default function UpdateSale({
                 });
               }
             }
-            else if (sale.import !== updateInfo.import) {
-              console.log('sdfsdfsd')
+            else if (sale.import) {
               salesData.import = sale.import;
               salesData.importState = 'not approved';
 
               await addDoc(collection(db, 'finances', useremail, 'finances'), {
                 amount: sale.import - updateInfo.import,
-                date: sale.salesDate,
-                reason: `${sale.import - updateInfo.import} as import adjustment for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
+                date: updateInfo.salesDate + '',
+                reason: `${sale.import} as impot for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
                 state: 'not approved',
                 type: 'expense',
               });
             }
-            console.log(sale.import,sale.paymentType , updateInfo.import);
 
             salesData.paymentType = sale.paymentType;
             salesData.price = sale.price;
@@ -258,7 +240,7 @@ export default function UpdateSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="import"
                             >
-                              import
+                              impot
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -266,6 +248,7 @@ export default function UpdateSale({
                               id="import"
                               name="import"
                               value={sale.import}
+                              disabled = {updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0) === parseInt(updateInfo.price) ? false : true}
                               placeholder={updateInfo.import}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)

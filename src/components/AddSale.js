@@ -56,7 +56,6 @@ export default function AddSale({
       !sale.paymentType ||
       !sale.price ||
       !sale.income ||
-      !sale.import ||
       !sale.customerName ||
       !sale.phoneNumber ||
       !sale.email
@@ -100,14 +99,6 @@ export default function AddSale({
             reason: `${sale.income} from ${sale.customerName} (${sale.phoneNumber}, ${sale.email}) for ${manufacturer} ${model} (${year}).`,
             state: 'not approved',
             type: 'sale',
-          });
-
-          await addDoc(collection(db, 'finances', useremail, 'finances'), {
-            amount: sale.import,
-            date: sale.salesDate,
-            reason: `${sale.import} as import for ${manufacturer} ${model} (${year}).`,
-            state: 'not approved',
-            type: 'expense',
           });
 
           addSaleModalSetting();
@@ -328,7 +319,7 @@ export default function AddSale({
                               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                               htmlFor="import"
                             >
-                              import
+                              impot
                             </label>
                             <input
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -336,6 +327,7 @@ export default function AddSale({
                               id="import"
                               name="import"
                               value={sale.import}
+                              disabled
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
                               }

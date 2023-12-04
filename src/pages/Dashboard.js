@@ -49,7 +49,7 @@ function Dashboard() {
   useEffect(()=> {
     // let salesDataFiltered = {};
     let revenueDataFiltered = {};
-    let revenue = 0;
+    let revenue = [];
     if (expenseDateRange.from && expenseDateRange.to) {
       Object.keys(revenueData).map((key) => {
         if (
@@ -60,19 +60,13 @@ function Dashboard() {
         }
       })
 
-      // const sortedEntries = Object.entries(revenueDataFiltered).sort((a, b) => a[1].date - b[1].date);
-
-      // sortedEntries.forEach(([key, value]) => {
-      //   revenueDataFiltered[key] = value;
-      // });
-
       setRevenueDataFiltered(revenueDataFiltered);
       revenue = Object.values(revenueDataFiltered).map((revenue) =>{
         return (
           parseInt(revenue.salesAmount - revenue.expenseAmount - revenue.importAmount)
         )
       })
-      setRevenue(revenue.reduce((sum,a) => sum += a), 0);
+      setRevenue(revenue.reduce((sum,a) => sum += a, 0));
     } else {
       setRevenueDataFiltered({});
       setRevenue(0);
@@ -83,25 +77,21 @@ function Dashboard() {
   useEffect(() => {
     let financeFiltered = {};
     if (financeDateRange.from && financeDateRange.to) {
-      financeFiltered = Object.keys(financeData).map((key) => {
-        return financeData[key].filter((item) => (
-          item.date >= financeDateRange.from &&
-          item.date <= financeDateRange.to
-        ))
+      Object.keys(financeData).map((key) => {
+        financeFiltered = {
+          ...financeFiltered,
+          [key]: []
+        }
+        for (let i in financeData[key]) {
+          if (
+            financeData[key][i].date >= financeDateRange.from &&
+            financeData[key][i].date <= financeDateRange.to
+          ) {
+            financeFiltered[key].push(financeData[key][i])
+          }
+        }
       })
     }
-
-  //   Object.keys(financeFiltered).forEach(key => {
-  //   const obj = financeFiltered[key];
-  //   const sortedEntries = Object.entries(obj).sort((a, b) => a[1].date > b[1].date ? -1 : 1);
-  //   const sortedObject = {};
-
-  //   sortedEntries.forEach(([innerKey, value]) => {
-  //     sortedObject[innerKey] = value;
-  //   });
-
-  //   financeFiltered[key] = sortedObject;
-  // });
 
     setFinanceFiltered(financeFiltered)
   }, [financeDateRange])
@@ -424,15 +414,16 @@ function Dashboard() {
     Object.keys(finances).forEach((key) => {
       finances[key].forEach((data) => {
         if (data.state === 'approved') {
-          let amount = data.amount;
-          const year = data.date.split('-')[0];
-          const month = parseInt(data.date.split('-')[1]) - 1;
+          let amount = parseInt(data.amount);
+          let date = data.date
+          let year = date.split('-')[0];
+          let month = parseInt(date.split('-')[1]) - 1;
           if (data.type === 'sale') {
-            financeAmount[0][year][month] += parseInt(amount);
+            financeAmount[0][year][month] += amount;
           } else if (data.type === 'expense') {
-            financeAmount[1][year][month] += parseInt(amount);
+            financeAmount[1][year][month] += amount;
           } else {
-            financeAmount[2][year][month] += parseInt(amount);
+            financeAmount[2][year][month] += amount;
           }
         }
       });
@@ -491,21 +482,12 @@ function Dashboard() {
 
   // export revenue data
   const exportSalesReport = async () => {
-    // const workbook = new ExcelJS.Workbook();
-    // const sheet = workbook.addWorksheet('report');
-
-    // const data = [
-    //   ['Name', 'Age', 'Country'],
-    //   ['John', 25, 'USA'],
-    //   ['Alice', 30, 'Canada'],
-    //   ['Bob', 22, 'UK']
-    // ];
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sheet1');
     
     const data = [
-      ['VIN', 'date', 'depenses/CFA', 'ventes/CFA', 'import/CFA', 'revenu/CFA', 'type de paiement', 'prix/CFA', 'nom du client', 'email', 'informations sur la voiture']
+      ['VIN', 'date', 'depenses/CFA', 'ventes/CFA', 'impot/CFA', 'revenu/CFA', 'type de paiement', 'prix/CFA', 'nom du client', 'email', 'informations sur la voiture']
     ];
 
     await Object.keys(revenueDataFiltered).map((key) => {
@@ -571,21 +553,102 @@ function Dashboard() {
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
       // Trigger download using FileSaver
-      saveAs(blob, `${(new Date).toLocaleDateString()}_report.xlsx`);
+      saveAs(blob, `${(new Date).toLocaleDateString()}_sales_report.xlsx`);
+    });
+  }
+
+  const exportFinanceReport = async () => {
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet1');
+    
+    const data = [
+      ['manager', 'ventes/CFA', 'depenses/CFA', 'budget/CFA', 'balance/CFA']
+    ];
+
+    await Object.keys(financeData).map((user) => {
+
+      let saleAmount = financeFiltered[user].reduce((sum, a) => {
+        if (a.type === 'sale' && a.state === 'approved') {
+          return sum += parseInt(a.amount)
+        }
+        return sum
+      }, 0)
+
+      let expenseAmount = financeFiltered[user].reduce((sum, a) => {
+        if (a.type === 'expense' && a.state === 'approved') {
+          return sum += parseInt(a.amount)
+        }
+        return sum
+      }, 0)
+
+      let imbersementAmount = financeFiltered[user].reduce((sum, a) => {
+        if (a.type === 'imbersement' && a.state === 'approved') {
+          return sum += parseInt(a.amount)
+        }
+        return sum
+      }, 0)
+
+      let balance = saleAmount + imbersementAmount - expenseAmount;
+
+      data.push(
+        [
+          user,
+          saleAmount.toLocaleString(),
+          expenseAmount.toLocaleString(),
+          imbersementAmount.toLocaleString(),
+          balance.toLocaleString(),
+        ]
+      )
+      
     });
 
-    // // Create a new workbook
-    // const workbook = XLSX.utils.book_new();
-    
-    // // Convert the array to a worksheet
-    // const worksheet = XLSX.utils.aoa_to_sheet(data);
-    
-    // // Add the worksheet to the workbook
-    // XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    
-    // // Write the workbook to a file
-    // XLSX.writeFile(workbook, 'data.xlsx');
+    data.forEach(row => {
+      worksheet.addRow(row);
+    })
 
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: 'center' };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor:{argb:'FFCCCCCC'},
+      };
+    });
+
+    for (let i in data[0]) {
+      i = Number(i)
+      const col = worksheet.getColumn(i+1);
+      col.width = 25;
+    }  
+
+    // Find the last row with data in column A
+    const lastRow = worksheet.actualRowCount;
+    const cols = ['B', 'C', 'D', 'E']
+
+    // Set the formula for the next cell in column A to calculate the sum from A1 to the last row
+    for (let i = 2; i <= lastRow; i++) {
+      for (let col of cols) {
+        worksheet.getCell(`${col}${lastRow + 1}`).value += parseInt(worksheet.getCell(`${col}${i}`).value.replaceAll(',', ''));
+      }
+    }
+    for (let col of cols) {
+      worksheet.getCell(`${col}${lastRow + 1}`).value = worksheet.getCell(`${col}${lastRow + 1}`).value.toLocaleString()
+    }
+
+    worksheet.getRow(lastRow + 1).eachCell((cell) => {
+      cell.font = { bold: true };
+    })
+
+    // Write the workbook to a file
+    workbook.xlsx.writeBuffer().then(buffer => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+      // Trigger download using FileSaver
+      saveAs(blob, `${(new Date).toLocaleDateString()}_financial_report.xlsx`);
+    });
   }
 
   return (
@@ -718,6 +781,13 @@ function Dashboard() {
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
+            </span>                
+            <span 
+              className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded"
+              style={{float: 'right'}}
+              onClick={() => exportFinanceReport()}
+            >
+              Export
             </span>
             </div>
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -790,7 +860,7 @@ function Dashboard() {
                   <tr key={user}>
                     <Popover>
                       <PopoverHandler>
-                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{users[user]}</td>
+                        <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">{user}</td>
                       </PopoverHandler>
                       <PopoverContent>
                         {financeFiltered[user].map((data, index) => {
@@ -982,7 +1052,7 @@ function Dashboard() {
                   dépenses/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  import/CFA
+                  impot/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                   ventes/CFA

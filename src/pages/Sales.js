@@ -202,7 +202,7 @@ function Sales() {
                     ventes montante/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    import/CFA
+                    impot/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     ventes équilibre/CFA
@@ -376,7 +376,7 @@ function Sales() {
                     ventes montant/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                    import/CFA
+                    impot/CFA
                   </th>
                   <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                     ventes équilibre/CFA
