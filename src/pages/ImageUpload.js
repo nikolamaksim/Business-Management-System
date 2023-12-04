@@ -105,7 +105,9 @@ function ImageUpload() {
               <div className="flex justify-between pt-5 pb-3 px-3">
                 <div className="flex gap-4 justify-center items-center ">
                   <span className="font-bold">Rechercher des images</span>
-                  <SearchByVIN />
+                  <SearchByVIN 
+                    updatePage = {updatePage}
+                   />
                 </div>
               </div>
               <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">

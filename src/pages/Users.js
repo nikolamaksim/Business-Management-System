@@ -39,7 +39,7 @@ function Users() {
       })
       setFinanceFiltered(financeFiltered);
     }
-  }, [financeDateRange])
+  }, [financeDateRange, updatePage])
 
   // Fetch Data of ALl User Items
   const fetchUserData= async () => {

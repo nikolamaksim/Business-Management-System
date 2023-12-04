@@ -20,7 +20,7 @@ code {
 
 td {
   min-width: 50px;
-  max-width: 400px;
+  max-width: 450px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
