@@ -33,13 +33,17 @@ function Users() {
   }, [updatePage]);
 
   useEffect(() => {
+    fetchExpenseData()
+  }, [userEmail, updatePage])
+
+  useEffect(() => {
     if (financeDateRange.from && financeDateRange.to) {
       const financeFiltered = expense.filter((expense) => {
         return (expense.date >= financeDateRange.from && expense.date <= financeDateRange.to)
       })
       setFinanceFiltered(financeFiltered);
     }
-  }, [financeDateRange, updatePage])
+  }, [financeDateRange, updatePage, expense])
 
   // Fetch Data of ALl User Items
   const fetchUserData= async () => {
@@ -53,9 +57,9 @@ function Users() {
   }
 
   // Fetch Expense Data for a certain user
-  const fetchExpenseData = async (useremail) => {
+  const fetchExpenseData = async () => {
     try {
-      const ExpenseData = await getDocs(collection(db, 'finances', useremail, 'finances'));
+      const ExpenseData = await getDocs(collection(db, 'finances', userEmail, 'finances'));
       let expense = ExpenseData.docs.map((doc) => ({...doc.data(), _id:doc.id}));
       expense = expense.sort((a, b) => (a.date > b.date) ? -1 : 1);
       setExpense(expense);
@@ -166,7 +170,6 @@ function Users() {
                           onClick={() => {
                             setUserName(element.firstName + ' ' + element.lastName)
                             setUserEmail(element.email);
-                            fetchExpenseData(element.email);
                             }}>
                           {element.firstName} {element.lastName}
                         </span>
@@ -300,7 +303,6 @@ function Users() {
                             className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded"
                             onClick={() => {
                               approveItem(userEmail, element._id)
-                              fetchExpenseData(userEmail)
                             }}
                           >
                             {element.state}
