@@ -487,13 +487,14 @@ function Dashboard() {
     const worksheet = workbook.addWorksheet('Sheet1');
     
     const data = [
-      ['VIN', 'date', 'depenses/CFA', 'ventes/CFA', 'impot/CFA', 'revenu/CFA', 'type de paiement', 'prix/CFA', 'nom du client', 'email', 'informations sur la voiture']
+      ['VIN', 'informations sur la voiture', 'date', 'depenses/CFA', 'ventes/CFA', 'impot/CFA', 'revenu/CFA', 'type de paiement', 'prix/CFA', 'nom du client', 'email',]
     ];
 
     await Object.keys(revenueDataFiltered).map((key) => {
       data.push(
         [
           key,
+          `${revenueDataFiltered[key].salesDetail.manufacturer} ${revenueDataFiltered[key].salesDetail.model} (${revenueDataFiltered[key].salesDetail.year})`,
           revenueDataFiltered[key].salesDate,
           revenueDataFiltered[key].expenseAmount.toLocaleString(),
           revenueDataFiltered[key].salesAmount.toLocaleString(),
@@ -503,7 +504,6 @@ function Dashboard() {
           parseInt(revenueDataFiltered[key].salesDetail.price).toLocaleString(),
           revenueDataFiltered[key].salesDetail.customerName,
           revenueDataFiltered[key].salesDetail.email,
-          `${revenueDataFiltered[key].salesDetail.manufacturer} ${revenueDataFiltered[key].salesDetail.model} (${revenueDataFiltered[key].salesDetail.year})`,
         ]
       )
     });
@@ -563,7 +563,7 @@ function Dashboard() {
     const worksheet = workbook.addWorksheet('Sheet1');
     
     const data = [
-      ['manager', 'ventes/CFA', 'depenses/CFA', 'budget/CFA', 'balance/CFA']
+      ['manager', 'ventes/CFA', 'depenses/CFA', 'impot/CFA', 'budget/CFA', 'balance/CFA']
     ];
 
     await Object.keys(financeData).map((user) => {
@@ -582,6 +582,13 @@ function Dashboard() {
         return sum
       }, 0)
 
+      let importAmount = financeFiltered[user].reduce((sum, a) => {
+        if (a.type === 'expense' && a.state === 'approved' && a.reason.includes('impot')) {
+          return sum += parseInt(a.amount)
+        }
+        return sum
+      }, 0)
+
       let imbersementAmount = financeFiltered[user].reduce((sum, a) => {
         if (a.type === 'imbersement' && a.state === 'approved') {
           return sum += parseInt(a.amount)
@@ -595,7 +602,8 @@ function Dashboard() {
         [
           user,
           saleAmount.toLocaleString(),
-          expenseAmount.toLocaleString(),
+          (expenseAmount - importAmount).toLocaleString(),
+          importAmount.toLocaleString(),
           imbersementAmount.toLocaleString(),
           balance.toLocaleString(),
         ]
@@ -762,33 +770,38 @@ function Dashboard() {
           </div>
         </div>
         {/* table */}
-        <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
+        <div className="overflow-x-auto flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
-            <span>
-              Aperçu des finances
-              <span className="ml-5 text-2xl">
-                {/* ${revenue} */}
+              <span>
+                Aperçu des finances
+                <span className="ml-5 text-2xl">
+                  {/* ${revenue} */}
+                </span>
               </span>
-            </span>
-            <span 
-              className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded" 
-              style={{float: 'right'}}
-              onClick={() => setFinanceDateRange({
-                from: '',
-                to: ''
-              })}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-            </span>                
-            <span 
-              className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded"
-              style={{float: 'right'}}
-              onClick={() => exportFinanceReport()}
-            >
-              Export
-            </span>
+              <span 
+                className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded" 
+                style={{float: 'right'}}
+                onClick={() => setFinanceDateRange({
+                  from: '',
+                  to: ''
+                })}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </span>
+              {
+                Object.keys(financeFiltered).length ?         
+                <span 
+                  className="text-blue-600 px-2 cursor-pointer hover:bg-slate-300 font-bold p-2 rounded"
+                  style={{float: 'right'}}
+                  onClick={() => exportFinanceReport()}
+                >
+                  Export
+                </span>
+                :
+                <></>
+              }   
             </div>
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
@@ -841,10 +854,10 @@ function Dashboard() {
                   user
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  sales/CFA
+                  ventes/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  expenses/CFA
+                  depenses/CFA
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
                   imbersement/CFA
@@ -962,7 +975,7 @@ function Dashboard() {
           />
           </div>
         </div>
-        <div className="flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
+        <div className="overflow-x-auto flex flex-col gap-4 rounded-lg border  border-gray-100 bg-white p-6  ">
             <div className="mb-3 text-l">
               <span>
                 Aperçu des ventes:

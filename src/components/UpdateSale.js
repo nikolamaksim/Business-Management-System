@@ -15,11 +15,12 @@ export default function UpdateSale({
 
   const useremail = JSON.parse(localStorage.getItem('user')).email;
 
+
   const [sale, setSale] = useState({
     salesDate: '',
     paymentType: updateInfo.paymentType,
     price: updateInfo.price,
-    income: '',
+    income: 0,
     import: updateInfo.import,
     customerName: updateInfo.customerName,
     phoneNumber: updateInfo.phoneNumber,
@@ -27,6 +28,7 @@ export default function UpdateSale({
   });
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
+  console.log(updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0) + parseInt(sale.income))
 
   // Handling Input Change for input fields
   const handleInputChange = (key, value) => {
@@ -59,18 +61,16 @@ export default function UpdateSale({
                 });
               }
             }
-            else if (sale.import) {
-              salesData.import = sale.import;
-              salesData.importState = 'not approved';
+            salesData.import = sale.import;
+            salesData.importState = 'not approved';
 
-              await addDoc(collection(db, 'finances', useremail, 'finances'), {
-                amount: sale.import - updateInfo.import,
-                date: updateInfo.salesDate + '',
-                reason: `${sale.import} as impot for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
-                state: 'not approved',
-                type: 'expense',
-              });
-            }
+            await addDoc(collection(db, 'finances', useremail, 'finances'), {
+              amount: sale.import - updateInfo.import,
+              date: updateInfo.salesDate + '',
+              reason: `${sale.import} as impot for ${updateInfo.manufacturer} ${updateInfo.model} (${updateInfo.year})`,
+              state: 'not approved',
+              type: 'expense',
+            });
 
             salesData.paymentType = sale.paymentType;
             salesData.price = sale.price;
@@ -248,7 +248,7 @@ export default function UpdateSale({
                               id="import"
                               name="import"
                               value={sale.import}
-                              disabled = {updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0) === parseInt(updateInfo.price) ? false : true}
+                              disabled = {updateInfo.income.reduce((sum, a) => sum += parseInt(a), 0) + parseInt(sale.income) === parseInt(updateInfo.price) ? false : true}
                               placeholder={updateInfo.import}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
