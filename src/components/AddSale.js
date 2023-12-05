@@ -29,7 +29,7 @@ export default function AddSale({
     paymentType: '',
     price: '',
     income: '',
-    import: '',
+    import: 0,
     customerName: '',
     phoneNumber: '',
     email: '',

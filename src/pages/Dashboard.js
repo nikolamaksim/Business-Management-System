@@ -347,7 +347,7 @@ function Dashboard() {
     docSnap.forEach((purchase) => {
       totalPurchaseAmount += parseInt(purchase.data().initial);
     });
-    setPurchaseAmount(totalPurchaseAmount.toLocaleString());
+    setPurchaseAmount(totalPurchaseAmount);
   }
 
   // Fetch Data of All Products
@@ -400,7 +400,7 @@ function Dashboard() {
         return doc.data();
       });
     }
-    
+
     setFinanceData(finances);
 
     // Construct Monthly Finance Data
@@ -534,12 +534,12 @@ function Dashboard() {
 
     // Set the formula for the next cell in column A to calculate the sum from A1 to the last row
     for (let i = 2; i <= lastRow; i++) {
-      worksheet.getCell(`C${lastRow + 1}`).value += parseInt(worksheet.getCell(`C${i}`).value.replaceAll(',', ''));
+      worksheet.getCell(`G${lastRow + 1}`).value += parseInt(worksheet.getCell(`G${i}`).value.replaceAll(',', ''));
       worksheet.getCell(`D${lastRow + 1}`).value += parseInt(worksheet.getCell(`D${i}`).value.replaceAll(',', ''));
       worksheet.getCell(`E${lastRow + 1}`).value += parseInt(worksheet.getCell(`E${i}`).value.replaceAll(',', ''));
       worksheet.getCell(`F${lastRow + 1}`).value += parseInt(worksheet.getCell(`F${i}`).value.replaceAll(',', ''));
     }
-    worksheet.getCell(`C${lastRow + 1}`).value = worksheet.getCell(`C${lastRow + 1}`).value.toLocaleString()
+    worksheet.getCell(`G${lastRow + 1}`).value = worksheet.getCell(`G${lastRow + 1}`).value.toLocaleString()
     worksheet.getCell(`D${lastRow + 1}`).value = worksheet.getCell(`D${lastRow + 1}`).value.toLocaleString()
     worksheet.getCell(`E${lastRow + 1}`).value = worksheet.getCell(`E${lastRow + 1}`).value.toLocaleString()
     worksheet.getCell(`F${lastRow + 1}`).value = worksheet.getCell(`F${lastRow + 1}`).value.toLocaleString()
@@ -634,7 +634,7 @@ function Dashboard() {
 
     // Find the last row with data in column A
     const lastRow = worksheet.actualRowCount;
-    const cols = ['B', 'C', 'D', 'E']
+    const cols = ['B', 'C', 'D', 'E', 'F']
 
     // Set the formula for the next cell in column A to calculate the sum from A1 to the last row
     for (let i = 2; i <= lastRow; i++) {
@@ -689,7 +689,19 @@ function Dashboard() {
             <p>
               <span className="text-2xl font-medium text-gray-900">
                 {" "}
-                CFA {purchaseAmount}{" "}
+                CFA 
+                {
+                (purchaseAmount + 
+                  Object.values(financeData).reduce((sum, user) => {
+                    for (let finance of user) {
+                      if (finance.type === 'expense' && finance.state === 'approved') {
+                        sum += parseInt(finance.amount)
+                      }
+                    }
+                    return sum
+                  }, 0))
+                  .toLocaleString()
+                }{" "}
               </span>
             </p>
           </div>

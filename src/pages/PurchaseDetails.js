@@ -286,7 +286,18 @@ function PurchaseDetails() {
                         </PopoverContent>
                       </Popover>
                       <td className="whitespace-nowrap px-2 text-gray-700">
-                        {additional[element._id] ? (parseInt(element.initial) + additional[element._id].reduce((sum, a) => sum += parseInt(a.amount), 0)).toLocaleString() : element.initial}
+                        {
+                          additional[element._id] ?
+                          (
+                            parseInt(element.initial) + additional[element._id].reduce((sum, a) => {
+                              if (a.state === 'approved') {
+                                sum += parseInt(a.amount)
+                              }
+                              return sum
+                            }, 0)
+                          ).toLocaleString() : 
+                          element.initial
+                        }
                       </td>
                       <td>
                         {element.state}

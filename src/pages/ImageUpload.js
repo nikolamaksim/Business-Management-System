@@ -41,6 +41,7 @@ function ImageUpload() {
                     })
                     .then(() => {
                         alert('Image principale téléchargée avec succès.')
+                        handlePageUpdate();
                     })
                 } else {
                     docSnap.slideImageUrl.push(
@@ -51,10 +52,10 @@ function ImageUpload() {
                     })
                     .then(() => {
                         alert('Image du diaporama téléchargée avec succès.')
+                        handlePageUpdate();
                     })
                 }
             });
-            handlePageUpdate();
         } catch (err) {
             alert('Veuillez réessayer.')
             console.log(err);
