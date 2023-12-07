@@ -23,8 +23,113 @@ function PurchaseDetails() {
   const [showVinExpenseModal, setShowVinExpenseModal] = useState(false);
 
   const [updatePage, setUpdatePage] = useState(false);
+  const [updateSort, setUpdateSort] = useState(false);
   
   const authContext = useContext(AuthContext);
+
+  const [sortOrderBySale, setSortOrderBySale] = useState(true);
+  const [sortOrderByExpense, setSortOrderByExpense] = useState(true);
+  const [sortOrderByDate, setSortOrderByDate] = useState(true);
+  const [sortOrderByYear, setSortOrderByYear] = useState(true);
+
+  // sort by sales status
+  useEffect(() => {
+    let order;
+    if (sortOrderBySale) {
+      order = {
+        'on sale': 1,
+        'not on sale': 2,
+        'sold': 3,
+      };
+    } else {
+      order = {
+        'not on sale': 1,
+        'on sale': 2,
+        'sold': 3,
+      };
+    }
+    purchase.sort((a, b) => {
+      return order[a.state] - order[b.state];
+    });
+    setAllPurchaseData(purchase);
+    handleSortUpdate();
+  }, [sortOrderBySale]);
+
+  // sort by approval status
+  useEffect(() => {
+    let order;
+    if (sortOrderByExpense) {
+      order = {
+        'approved': 1,
+        'not approved': 2
+      };
+    } else {
+      order = {
+        'not approved': 1,
+        'approved': 2
+      };
+    }
+    purchase.sort((a, b) => {
+      if (additional[a._id].length !== 0) {
+        if (additional[b._id].length !== 0) {
+          return order[additional[a._id][additional[a._id].length - 1].state] -
+                  order[additional[b._id][additional[b._id].length - 1].state]
+        } else {
+          return -1
+        }
+      } else {
+        return 1
+      }
+    });
+    setAllPurchaseData(purchase);
+    handleSortUpdate();
+  }, [sortOrderByExpense])
+
+  // sort by date
+  useEffect(() => {
+    if (sortOrderByDate) {
+      purchase.sort((a, b) => {
+        if (a.purchaseDate < b.purchaseDate) {
+          return -1
+        } else {
+          return 1
+        }
+      })
+    } else {
+      purchase.sort((a, b) => {
+        if (a.purchaseDate < b.purchaseDate) {
+          return 1
+        } else {
+          return -1
+        }
+      });
+    }
+    setAllPurchaseData(purchase);
+    handleSortUpdate();
+  }, [sortOrderByDate])
+
+  // sort by year
+  useEffect(() => {
+    if (sortOrderByYear) {
+      purchase.sort((a, b) => {
+        if (a.year < b.year) {
+          return -1
+        } else {
+          return 1
+        }
+      })
+    } else {
+      purchase.sort((a, b) => {
+        if (a.year < b.year) {
+          return 1
+        } else {
+          return -1
+        }
+      })
+    }
+    setAllPurchaseData(purchase);
+    handleSortUpdate();
+  }, [sortOrderByYear])
 
   useEffect(() => {
     fetchPurchaseData();
@@ -43,6 +148,7 @@ function PurchaseDetails() {
           return doc.data();
         })
         additional[element._id] = docData;
+        console.log(additional[element._id].length)
       }
       setAdditional(additional);
     } catch (err) {
@@ -139,6 +245,11 @@ function PurchaseDetails() {
   // Handle Page Update
   const handlePageUpdate = () => {
     setUpdatePage(!updatePage);
+  };  
+  
+  // Handle Page Update
+  const handleSortUpdate = () => {
+    setUpdateSort(!updateSort);
   };
 
   return (
@@ -202,11 +313,51 @@ function PurchaseDetails() {
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     modèle
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    année
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderByYear(!sortOrderByYear)}
+                  >
+                    <div className="flex justify-between">
+                      <span>
+                        année
+                      </span>
+                      <span>
+                        {
+                          sortOrderByYear === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    date
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderByDate(!sortOrderByDate)}
+                  >
+                    <div className="flex justify-between">
+                      <span>
+                        date
+                      </span>
+                      <span>
+                        {
+                          sortOrderByDate === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     emplacement
@@ -214,14 +365,50 @@ function PurchaseDetails() {
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     initiales Exp/CFA
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    supplémentaire Exp/CFA
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 flex justify-between cursor-pointer"
+                    onClick={() => setSortOrderByExpense(!sortOrderByExpense)}
+                  >
+                    <span>
+                      supplémentaire Exp/CFA
+                    </span>
+                    <span>
+                      {
+                        sortOrderByExpense === true
+                        ?
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                        </svg>
+                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                        </svg>
+                      }
+                    </span>
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     totale Exp/CFA
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    statut approuvé
+                  <th
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer flex justify-between"
+                    onClick={() => setSortOrderBySale(!sortOrderBySale)}
+                  >
+                    <span>
+                      statut approuvé
+                    </span>
+                    <span>
+                      {
+                        sortOrderBySale === true
+                        ?
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                        </svg>
+                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                        </svg>
+                      }
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -377,21 +564,102 @@ function PurchaseDetails() {
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     modèle
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    année
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderByYear(!sortOrderByYear)}
+                  >
+                    <div className="flex">
+                      <span>
+                        année
+                      </span>
+                      <span>
+                        {
+                          sortOrderByYear === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    date
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderByDate(!sortOrderByDate)}
+                  >
+                    <div className="flex">
+                      <span>
+                        date
+                      </span>
+                      <span>
+                        {
+                          sortOrderByDate === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
                   <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                     emplacement
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    supplémentaire Exp/CFA
+                  <th 
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderByExpense(!sortOrderByExpense)}
+                  >
+                    <div className="flex">
+                      <span>
+                        supplémentaire Exp/CFA
+                      </span>
+                      <span>
+                        {
+                          sortOrderByExpense === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
-                  <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                    statut
+                  <th
+                    className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                    onClick={() => setSortOrderBySale(!sortOrderBySale)}
+                  >
+                    <div className="flex">
+                      <span>
+                        statut approuvé
+                      </span>
+                      <span>
+                        {
+                          sortOrderBySale === true
+                          ?
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                          </svg>
+                          :
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                          </svg>
+                        }
+                      </span>
+                    </div>
                   </th>
+                  <th></th>
                 </tr>
               </thead>
 

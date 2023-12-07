@@ -12,6 +12,7 @@ function Users() {
   const [showUserModal, setUserModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [updatePage, setUpdatePage] = useState(true);
+  const [updateSort, setUpdateSort] = useState(true)
 
   const [expense, setExpense] = useState([]);
   const [username, setUserName] = useState('');
@@ -27,6 +28,29 @@ function Users() {
     from: '',
     to: ''
   });
+
+  const [sortOrderByState, setSortOrderByState] = useState(true);
+
+  // sort by sales status
+  useEffect(() => {
+    let order;
+    if (sortOrderByState) {
+      order = {
+        'approved': 1,
+        'not approved': 2,
+      };
+    } else {
+      order = {
+        'not approved': 1,
+        'approved': 2,
+      };
+    }
+    financeFiltered.sort((a, b) => {
+      return order[a.state] - order[b.state];
+    });
+    setFinanceFiltered(financeFiltered);
+    handleSortUpdate();
+  }, [sortOrderByState]);
 
   useEffect(() => {
     fetchUserData();
@@ -110,6 +134,11 @@ function Users() {
   // Handle Page Update
   const handlePageUpdate = () => {
     setUpdatePage(!updatePage);
+  };
+
+  // Handle Page Update
+  const handleSortUpdate = () => {
+    setUpdateSort(!updateSort);
   };
 
   return (
@@ -275,9 +304,29 @@ function Users() {
                 </th>  
                 <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
                   explication
-                </th>  
-                <th className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900">
-                  statut
+                </th>
+                <th 
+                  className="whitespace-nowrap px-2 py-2 text-left font-medium text-gray-900 cursor-pointer"
+                  onClick={() => setSortOrderByState(!sortOrderByState)}
+                >
+                  <div className="flex justify-between">
+                    <span>
+                      statut
+                    </span>
+                    <span>
+                      {
+                        sortOrderByState === true
+                        ?
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25L12 21m0 0l-3.75-3.75M12 21V3" />
+                        </svg>
+                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75L12 3m0 0l3.75 3.75M12 3v18" />
+                        </svg>
+                      }
+                    </span>
+                  </div>
                 </th>
               </tr>
             </thead>
