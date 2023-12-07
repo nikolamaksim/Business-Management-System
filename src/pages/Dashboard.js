@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { collection, doc, getDoc, query, getDocs, where, documentId } from "firebase/firestore";
+import { collection, query, getDocs, where } from "firebase/firestore";
 import { db } from "../config/firebase.config";
 import { Popover, PopoverContent, PopoverHandler } from "@material-tailwind/react";
 import { saveAs } from "file-saver";

@@ -1,5 +1,5 @@
 import { db } from "../config/firebase.config";
-import { collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { storage } from "../config/firebase.config";
 
 import React, { useState, useEffect, useContext } from "react";
@@ -224,6 +224,30 @@ function PurchaseDetails() {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  // undo sale
+  const undoSale = async (element) => {
+    const confirm = window.confirm('Les données commerciales stockées dans la base de données seront supprimées. Veuillez vous assurer que vous avez stocké les données de vente en lieu sûr avant de les supprimer. Vous devrez également supprimer les données pertinentes de la page Finances.')
+    if (confirm) {
+      try {
+        await updateDoc(doc(db, 'products', element._id), {
+          state: 'on sale'
+        });
+        var q = query(collection(db, 'sales'), where('vin', '==', element.vin));
+        var querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const docToDelete = querySnapshot.docs[0];
+          await deleteDoc(docToDelete.ref);
+        } else {
+          console.log('No matching document found.');
+        }
+        handlePageUpdate();
+      } catch (err) {
+        console.log(err)
+      }
+     }
   }
 
   // Modal for Purchase Add
@@ -500,7 +524,16 @@ function PurchaseDetails() {
                           </td>
                           <td></td>
                           <td></td>
-                          <td></td>
+                          <td>
+                            <span
+                              className="text-green-700 cursor-pointer"
+                              onClick={() => undoSale(element)}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                              </svg>
+                            </span>
+                          </td>
                           <td></td>
                         </>
                         :
