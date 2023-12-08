@@ -2,19 +2,17 @@ import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { collection, query, getDocs, where } from "firebase/firestore";
+import { collection, query, getDocs, where, getDoc } from "firebase/firestore";
 import { db } from "../config/firebase.config";
 import { Popover, PopoverContent, PopoverHandler } from "@material-tailwind/react";
 import { saveAs } from "file-saver";
 
 const ExcelJS = require('exceljs');
-const XLSX = require('xlsx');
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
 
-  const [users, setUsers] = useState([]);
   const [saleAmount, setSaleAmount] = useState([]);
   const [purchaseAmount, setPurchaseAmount] = useState([]);
   const [products, setProducts] = useState([]);
@@ -43,6 +41,7 @@ function Dashboard() {
   });
 
   const [financeFiltered, setFinanceFiltered] = useState({})
+  const [productsFiltered, setProductsFiltered] = useState([])
   const [revenue, setRevenue] = useState(0);
 
   // Filter the Expense Data
@@ -75,25 +74,42 @@ function Dashboard() {
 
   // Filter the Finance Data
   useEffect(() => {
-    let financeFiltered = {};
-    if (financeDateRange.from && financeDateRange.to) {
-      Object.keys(financeData).map((key) => {
-        financeFiltered = {
-          ...financeFiltered,
-          [key]: []
-        }
-        for (let i in financeData[key]) {
-          if (
-            financeData[key][i].date >= financeDateRange.from &&
-            financeData[key][i].date <= financeDateRange.to
-          ) {
-            financeFiltered[key].push(financeData[key][i])
+    const financeFilter = async () => {
+      let financeFiltered = {};
+      let productsFiltered = [];
+  
+      if (financeDateRange.from && financeDateRange.to) {
+        // filter finance data
+        Object.keys(financeData).map((key) => {
+          financeFiltered = {
+            ...financeFiltered,
+            [key]: []
           }
-        }
-      })
-    }
+          for (let i in financeData[key]) {
+            if (
+              financeData[key][i].date >= financeDateRange.from &&
+              financeData[key][i].date <= financeDateRange.to
+            ) {
+              financeFiltered[key].push(financeData[key][i])
+            }
+          }
+        });
+        // filter product data
+        productsFiltered = productsTotal.filter((product) => {
+          return (product.purchaseDate >= financeDateRange.from && product.purchaseDate <= financeDateRange.to);
+        });
 
-    setFinanceFiltered(financeFiltered)
+        for (let i in productsFiltered) {
+          let additionalSnap = await getDocs(collection(db, 'products', productsFiltered[i]._id, 'additional'))
+          let additional = additionalSnap.docs.map((doc) => doc.data());
+          productsFiltered[i].additional = additional;
+        }
+      }
+  
+      setFinanceFiltered(financeFiltered);
+      setProductsFiltered(productsFiltered);
+    };
+    financeFilter();
   }, [financeDateRange])
 
   const [manufacturerdata, setManufacturerdata] = useState({});
@@ -354,7 +370,7 @@ function Dashboard() {
   const fetchProductsData = async () => {
     const docSnap = await getDocs(collection(db, 'products'));
     const productDataTotal = docSnap.docs.map((doc) => {
-      return doc.data();
+      return {...doc.data(), _id: doc.id};
     })
     const productData = productDataTotal.filter((data) => data.state !== 'sold');
     const productDataSold = productDataTotal.filter((data) => data.state === 'sold');
@@ -389,8 +405,6 @@ function Dashboard() {
     // get userdata
     const docSnap_user = await getDocs(query(collection(db, 'users'), where('role', '==', 'normal')));
     const users = docSnap_user.docs.map((doc) => {return doc.data().email});
-
-    setUsers(users);
 
     // Retrieve Finance Data
     const finances = {};
@@ -671,7 +685,13 @@ function Dashboard() {
 
             <p>
               <span className="text-2xl font-medium text-gray-900">
-                CFA {saleAmount.toLocaleString()}
+                CFA {" "}
+                {
+                  revenue
+                  ?
+                  revenue.toLocaleString()
+                  :
+                  saleAmount.toLocaleString()}
               </span>
 
               <span className="font-medium ml-3 inline-flex gap-2 self-end rounded bg-pink-100 px-3">{salesstate.bad}</span>
@@ -688,20 +708,40 @@ function Dashboard() {
 
             <p>
               <span className="text-2xl font-medium text-gray-900">
-                {" "}
                 CFA 
+                {" "}
                 {
-                (purchaseAmount + 
-                  Object.values(financeData).reduce((sum, user) => {
-                    for (let finance of user) {
-                      if (finance.type === 'expense' && finance.state === 'approved') {
-                        sum += parseInt(finance.amount)
+                  productsFiltered[0]
+                  ?
+                    (productsFiltered.reduce((sum, product) => {
+                      sum += (parseInt(product.initial) + (
+                        product.additional.reduce((subsum, a) => {
+                          return subsum += parseInt(a.amount)
+                        }, 0)
+                      ))
+                      return sum
+                    }, 0)
+                    +
+                    Object.values(financeFiltered).reduce((sum, user) => {
+                      for (let finance of user) {
+                        if (finance.type === 'expense' && finance.state === 'approved') {
+                          sum += parseInt(finance.amount)
+                        }
                       }
-                    }
-                    return sum
-                  }, 0))
-                  .toLocaleString()
-                }{" "}
+                      return sum
+                    }, 0)).toLocaleString()
+                  :
+                    (purchaseAmount + 
+                      Object.values(financeData).reduce((sum, user) => {
+                        for (let finance of user) {
+                          if (finance.type === 'expense' && finance.state === 'approved') {
+                            sum += parseInt(finance.amount)
+                          }
+                        }
+                        return sum
+                      }, 0))
+                      .toLocaleString()
+                  }{" "}
               </span>
             </p>
           </div>
@@ -950,6 +990,98 @@ function Dashboard() {
                       }, 0).toLocaleString()}
                     </td>
                   </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          {/* expenses for cars */}
+          <table id="myTb" className="min-w-full divide-y-2 divide-gray-200 text-sm">
+            <thead>
+              <tr>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  VIN
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  make
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  model
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
+                  depenses/CFA
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {productsFiltered.map((product) => {
+                return (
+                  <>
+                    <tr>
+                      <Popover>
+                        <PopoverHandler>
+                          <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">
+                            {product.vin}
+                          </td>
+                        </PopoverHandler>
+                        <PopoverContent>
+                          <div className="grid grid-cols-6 gap-4">
+                            <div className="grid col-span-3">
+                              <p>annie</p>
+                              <p>date</p>
+                              <p>initial depense</p>
+                              <p>emplacement</p>
+                              <p>statut</p>
+                            </div>
+                            <div className="grid col-span-3">
+                              <p>{product.year}</p>
+                              <p>{product.purchaseDate}</p>
+                              <p>CFA {parseInt(product.initial).toLocaleString()}</p>
+                              <p>{product.location}</p>
+                              <p>{product.state}</p>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                        {product.manufacturer}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                        {product.model}
+                      </td>
+                      <Popover>
+                        <PopoverHandler>
+                          <td className="whitespace-nowrap px-4 py-2 text-gray-900 cursor-pointer">
+                            {
+                              product.additional[0] 
+                              ?
+                              (parseInt(product.initial) +
+                              product.additional.reduce((sum, a) => {
+                                if (a.state === 'approved') {
+                                  sum += parseInt(a.amount)
+                                }
+                                return sum
+                              }, 0)).toLocaleString()
+                              :
+                              parseInt(product.initial).toLocaleString()
+                            }
+                          </td>
+                        </PopoverHandler>
+                        <PopoverContent>
+                          {product.additional.map((expense) => {
+                            return (
+                              <div className="grid grid-cols-10 gap-4">
+                                <div className="grid col-span-2">{expense.date}</div>
+                                <div className="grid col-span-2">CFA {parseInt(expense.amount).toLocaleString()}</div>
+                                <div className="grid col-span-4">{expense.reason}</div>
+                                <div className="grid col-span-2">{expense.state}</div>
+                              </div>
+                            )
+                          })}
+                        </PopoverContent>
+                      </Popover>
+                    </tr>
+                  </>
                 )
               })}
             </tbody>
